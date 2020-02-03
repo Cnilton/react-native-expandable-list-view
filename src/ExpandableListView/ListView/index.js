@@ -18,7 +18,7 @@ export default class ListView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      list: props.list,
+      data: props.data,
       index: null,
       animatedValue: new Animated.Value(0),
       rotateValueHolder: new Animated.Value(0),
@@ -26,7 +26,7 @@ export default class ListView extends Component {
   }
 
   updateLayout = index => {
-    const array = [...this.props.list];
+    const array = [...this.props.data];
     array.map((value, placeindex) => {
       if (placeindex === index) {
         array[placeindex].isExpanded = !array[placeindex].isExpanded;
@@ -40,9 +40,9 @@ export default class ListView extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (state.index !== null) {
-      if (props.list[state.index].isExpanded) {
+      if (props.data[state.index].isExpanded) {
         let height = 0
-        props.list[state.index].subCategory.map(innerItem => {
+        props.data[state.index].subCategory.map(innerItem => {
           height = height + 
             (innerItem.innerCellHeight !== undefined 
           ? 
@@ -83,7 +83,7 @@ export default class ListView extends Component {
   }
 
   renderInnerItem = item => {
-    let {itemContainerStyle} = this.props;
+    let {itemContainerStyle, itemLabelStyle} = this.props;
     itemContainerStyle = {
       ...styles.content,
       ...itemContainerStyle,
@@ -100,30 +100,46 @@ export default class ListView extends Component {
       )
     }
 
+    itemLabelStyle = {
+      ...styles.text,
+      ...itemLabelStyle,
+    }
+
     return (
       <TouchableOpacity
         activeOpacity={0.6}
         key={Math.random}
         style={itemContainerStyle}
         onPress={() => this.props.onInnerItemClick(item)}>
-        <View>
-          <Text style={styles.text}>{item.item.name}</Text>
-        </View>
+          <Text style={itemLabelStyle}>{item.item.name}</Text>
       </TouchableOpacity>
     );
   };
 
   render() {
-    let {headerContainerStyle, headerLabelStyle} = this.props;
+    let {headerContainerStyle, headerLabelStyle, headerImageIndicatorStyle} = this.props;
     headerContainerStyle = {
       ...styles.header,
-      ...headerContainerStyle
+      ...headerContainerStyle,
+      height: (
+        this.props.item.item.cellHeight !== undefined 
+      ? 
+      this.props.item.item.cellHeight 
+      : 
+        this.props.headerContainerStyle !== undefined && this.props.headerContainerStyle.height !== undefined
+      ? 
+        this.props.headerContainerStyle.height 
+      : 
+        40
+    )
     }
     headerLabelStyle = {
       ...styles.headerText,
       ...headerLabelStyle
     }
-
+    headerImageIndicatorStyle = {
+      ...headerImageIndicatorStyle,
+    }
 
     return (
       <Fragment>
@@ -132,7 +148,7 @@ export default class ListView extends Component {
           onPress={() => this.updateLayout(this.props.item.index)}
           style={headerContainerStyle}>
           <Animated.Image
-            source={
+            source = {
               this.props.customChevron !== undefined 
                 ? this.props.customChevron
                 : this.props.chevronColor != undefined &&
@@ -141,23 +157,26 @@ export default class ListView extends Component {
             }
             resizeMethod="scale"
             resizeMode="contain"
-            style={[
-              this.props.item.item.isExpanded && {
-                transform: [
-                  {
-                    rotate: this.state.rotateValueHolder.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [
-                        '0deg',
-                        this.props.item.item.isExpanded
-                          ? '90deg'
-                          : '-90deg',
-                      ],
-                    }),
-                  },
-                ],
-              },
-            ]}
+            style={
+              [
+                headerImageIndicatorStyle,
+                this.props.item.item.isExpanded && {
+                  transform: [
+                    {
+                      rotate: this.state.rotateValueHolder.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [
+                          '0deg',
+                          this.props.item.item.isExpanded
+                            ? '90deg'
+                            : '-90deg',
+                        ],
+                      }),
+                    },
+                  ],
+                },
+              ]
+            }
           />
           <Text style={headerLabelStyle}>
             {this.props.item.item.categoryName}
@@ -172,7 +191,7 @@ export default class ListView extends Component {
             },
           ]}>
           <FlatList
-            keyExtractor={() => Math.random()}
+            keyExtractor={() => Math.random().toString()}
             listKey={() => this.props.item.item.id + this.props.item.index}
             data={this.props.item.item.subCategory}
             renderItem={(innerItem, index) => this.renderInnerItem(innerItem)}

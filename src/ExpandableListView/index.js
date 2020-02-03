@@ -11,13 +11,15 @@ export default class ExpandableListView extends Component {
   renderItem = item => {
     return (
       <ListView
+        headerImageIndicatorStyle={this.props.headerImageIndicatorStyle}
+        itemLabelStyle={this.props.itemLabelStyle}
         itemContainerStyle={this.props.itemContainerStyle}
         headerContainerStyle={this.props.headerContainerStyle}
         headerLabelStyle={this.props.headerLabelStyle}
         customChevron={this.props.customChevron}
         chevronColor={this.props.chevronColor}
         item={item}
-        list={this.props.list}
+        data={this.props.data}
         onItemClick={this.props.onItemClick}
         onInnerItemClick={this.props.onInnerItemClick}
       />
@@ -27,8 +29,8 @@ export default class ExpandableListView extends Component {
   render() {
     return (
       <FlatList
-        keyExtractor={item => item.index}
-        data={this.props.list}
+        keyExtractor={(item, index) => index.toString()}
+        data={this.props.data}
         renderItem={item => this.renderItem(item)}
       />
     );

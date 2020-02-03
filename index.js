@@ -1,9 +1,3 @@
-/**
- * @format
- */
+import ExpandableListView from './src/ExpandableListView';
 
-import {AppRegistry} from 'react-native';
-import App from './src';
-import {name as appName} from './app.json';
-
-AppRegistry.registerComponent(appName, () => App);
+export default ExpandableListView;

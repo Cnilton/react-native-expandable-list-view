@@ -1,7 +1,25 @@
 {
-  "name": "reactNativeExpandableListview",
-  "version": "0.0.1",
-  "private": true,
+  "name": "react-native-expandable-listview",
+  "description": "A simple and (almost) fully customizable React Native ExpandableListView component.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cnilton/react-native-expandable-list-view.git"
+  },
+  "keywords": [
+    "react-native",
+    "react-native-component",
+    "react",
+    "react native",
+    "mobile",
+    "ios",
+    "android",
+    "checkbox",
+    "react-native-checkbox",
+    "customizable"
+  ],
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -9,10 +27,16 @@
     "test": "jest",
     "lint": "eslint ."
   },
-  "dependencies": {
-    "react": "16.9.0",
-    "react-native": "0.61.5"
+  "author": "Caio Nilton",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
   },
+  "bugs": {
+    "url": "https://github.com/Cnilton/react-native-expandable-list-view/issues"
+  },
+  "homepage": "https://github.com/Cnilton/react-native-expandable-list-view#readme",
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
