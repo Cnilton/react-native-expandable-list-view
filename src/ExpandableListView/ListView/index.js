@@ -1,13 +1,6 @@
 import React, {Component, Fragment} from 'react';
 
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  FlatList,
-  Text,
-  Easing,
-} from 'react-native';
+import {TouchableOpacity, Animated, FlatList, Text, Easing} from 'react-native';
 
 import styles from '../styles';
 
@@ -41,19 +34,17 @@ export default class ListView extends Component {
   static getDerivedStateFromProps(props, state) {
     if (state.index !== null) {
       if (props.data[state.index].isExpanded) {
-        let height = 0
+        let height = 0;
         props.data[state.index].subCategory.map(innerItem => {
-          height = height + 
-            (innerItem.innerCellHeight !== undefined 
-          ? 
-            innerItem.innerCellHeight 
-          : 
-            props.itemContainerStyle !== undefined && props.itemContainerStyle.height !== undefined
-          ? 
-            props.itemContainerStyle.height 
-          : 
-            40)
-        })
+          height =
+            height +
+            (innerItem.innerCellHeight !== undefined
+              ? innerItem.innerCellHeight
+              : props.itemContainerStyle !== undefined &&
+                props.itemContainerStyle.height !== undefined
+              ? props.itemContainerStyle.height
+              : 40);
+        });
         Animated.spring(state.animatedValue, {
           friction: 10,
           toValue: height,
@@ -87,59 +78,57 @@ export default class ListView extends Component {
     itemContainerStyle = {
       ...styles.content,
       ...itemContainerStyle,
-      height: (
-          item.item.innerCellHeight !== undefined 
-        ? 
-          item.item.innerCellHeight 
-        : 
-          this.props.itemContainerStyle !== undefined && this.props.itemContainerStyle.height !== undefined
-        ? 
-          this.props.itemContainerStyle.height 
-        : 
-          40
-      )
-    }
+      height:
+        item.item.innerCellHeight !== undefined
+          ? item.item.innerCellHeight
+          : this.props.itemContainerStyle !== undefined &&
+            this.props.itemContainerStyle.height !== undefined
+          ? this.props.itemContainerStyle.height
+          : 40,
+    };
 
     itemLabelStyle = {
       ...styles.text,
       ...itemLabelStyle,
-    }
+    };
 
     return (
       <TouchableOpacity
         activeOpacity={0.6}
         key={Math.random}
         style={itemContainerStyle}
-        onPress={() => this.props.onInnerItemClick(item)}>
-          <Text style={itemLabelStyle}>{item.item.name}</Text>
+        onPress={() =>
+          this.props.onInnerItemClick(item.index, this.props.item)
+        }>
+        <Text style={itemLabelStyle}>{item.item.name}</Text>
       </TouchableOpacity>
     );
   };
 
   render() {
-    let {headerContainerStyle, headerLabelStyle, headerImageIndicatorStyle} = this.props;
+    let {
+      headerContainerStyle,
+      headerLabelStyle,
+      headerImageIndicatorStyle,
+    } = this.props;
     headerContainerStyle = {
       ...styles.header,
       ...headerContainerStyle,
-      height: (
-        this.props.item.item.cellHeight !== undefined 
-      ? 
-      this.props.item.item.cellHeight 
-      : 
-        this.props.headerContainerStyle !== undefined && this.props.headerContainerStyle.height !== undefined
-      ? 
-        this.props.headerContainerStyle.height 
-      : 
-        40
-    )
-    }
+      height:
+        this.props.item.item.cellHeight !== undefined
+          ? this.props.item.item.cellHeight
+          : this.props.headerContainerStyle !== undefined &&
+            this.props.headerContainerStyle.height !== undefined
+          ? this.props.headerContainerStyle.height
+          : 40,
+    };
     headerLabelStyle = {
       ...styles.headerText,
-      ...headerLabelStyle
-    }
+      ...headerLabelStyle,
+    };
     headerImageIndicatorStyle = {
       ...headerImageIndicatorStyle,
-    }
+    };
 
     return (
       <Fragment>
@@ -148,35 +137,32 @@ export default class ListView extends Component {
           onPress={() => this.updateLayout(this.props.item.index)}
           style={headerContainerStyle}>
           <Animated.Image
-            source = {
-              this.props.customChevron !== undefined 
+            source={
+              this.props.customChevron !== undefined
                 ? this.props.customChevron
                 : this.props.chevronColor != undefined &&
-                this.props.chevronColor == 'white' ?
-                chevronWhite : chevronBlack
+                  this.props.chevronColor == 'white'
+                ? chevronWhite
+                : chevronBlack
             }
             resizeMethod="scale"
             resizeMode="contain"
-            style={
-              [
-                headerImageIndicatorStyle,
-                this.props.item.item.isExpanded && {
-                  transform: [
-                    {
-                      rotate: this.state.rotateValueHolder.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [
-                          '0deg',
-                          this.props.item.item.isExpanded
-                            ? '90deg'
-                            : '-90deg',
-                        ],
-                      }),
-                    },
-                  ],
-                },
-              ]
-            }
+            style={[
+              headerImageIndicatorStyle,
+              this.props.item.item.isExpanded && {
+                transform: [
+                  {
+                    rotate: this.state.rotateValueHolder.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [
+                        '0deg',
+                        this.props.item.item.isExpanded ? '90deg' : '-90deg',
+                      ],
+                    }),
+                  },
+                ],
+              },
+            ]}
           />
           <Text style={headerLabelStyle}>
             {this.props.item.item.categoryName}
