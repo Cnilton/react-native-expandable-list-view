@@ -2,40 +2,98 @@ import React, {Component, Fragment} from 'react';
 
 import {TouchableOpacity, Animated, FlatList, Text, Easing} from 'react-native';
 
+import {StyleSheet} from 'react-native'
+
 import styles from '../styles';
 
 import chevronWhite from '../assets/images/arrow_white.png';
 import chevronBlack from '../assets/images/arrow_black.png';
 
-export default class ListView extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: props.data,
-      index: null,
-      animatedValue: new Animated.Value(0),
-      rotateValueHolder: new Animated.Value(0),
-    };
+interface State extends Object{
+  index: number;
+  rotateValueHolder: Animated.Value;
+  animatedValue: Animated.Value;
+}
+
+interface Item extends Array<any>{
+  isExpanded: Boolean;
+  item: InnerItem;
+  index: number;
+  cellHeight?: number;
+  categoryName: String;
+  id: number;
+  subCategory: Array<InnerItem>
+}
+
+interface InnerItem{
+  item: Object;
+  index: number;
+  name: String;
+  innerCellHeight?: number;
+}
+
+interface Props extends Object{
+  itemContainerStyle?: StyleSheet;
+  itemLabelStyle?: StyleSheet;
+  headerContainerStyle?: StyleSheet;
+  headerLabelStyle?: StyleSheet;
+  customComponent?: Component;
+  headerImageIndicatorStyle?: StyleSheet;
+  customChevron?: String;
+  chevronColor?: String;
+  item: Item;
+  index: number;
+  height?: number; 
+  data: Item;
+  onInnerItemClick: Function;
+  onItemClick: Function;
+}
+
+interface Types extends Object{
+  props: Props;
+  value: Boolean;
+  setState: Function;
+  isContainerClickable?: true | false;
+  useNativeDriver?: Boolean;
+  colorActive?: String;
+  colorInactive?: String;
+  textStyle?: Object;
+  boxStyle?: Object;
+  containerStyle?: Object;
+  label?: String;
+  checkImage?: String;
+}
+
+export default class ListView extends Component<Types> {
+
+  static props: Props
+  static setState: Function;
+
+  state = {
+    data: ListView.props.data,
+    index: null,
+    animatedValue: new Animated.Value(0),
+    rotateValueHolder: new Animated.Value(0),
   }
 
-  updateLayout = index => {
-    const array = [...this.props.data];
+  updateLayout = (index: number) => {
+    const array = [ListView.props.data];
     array.map((value, placeindex) => {
       if (placeindex === index) {
         array[placeindex].isExpanded = !array[placeindex].isExpanded;
-        this.setState({index: index});
+        ListView.setState({index: index});
       } else {
         array[placeindex].isExpanded = false;
       }
     });
-    return this.props.onItemClick(array);
+    return ListView.props.onItemClick(array);
   };
 
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: Props, state: State) {
     if (state.index !== null) {
       if (props.data[state.index].isExpanded) {
         let height = 0;
-        props.data[state.index].subCategory.map(innerItem => {
+        props.data[state.index].subCategory.map((innerItem: InnerItem) => {
           height =
             height +
             (innerItem.innerCellHeight !== undefined
@@ -73,17 +131,17 @@ export default class ListView extends Component {
     return null;
   }
 
-  renderInnerItem = item => {
-    let {itemContainerStyle, itemLabelStyle} = this.props;
+  renderInnerItem = (item: InnerItem, index: number) => {
+    let {itemContainerStyle, itemLabelStyle} = ListView.props;
     itemContainerStyle = {
       ...styles.content,
       ...itemContainerStyle,
       height:
-        item.item.innerCellHeight !== undefined
-          ? item.item.innerCellHeight
-          : this.props.itemContainerStyle !== undefined &&
-            this.props.itemContainerStyle.height !== undefined
-          ? this.props.itemContainerStyle.height
+        item.innerCellHeight !== undefined
+          ? item.innerCellHeight
+          : ListView.props.itemContainerStyle !== undefined &&
+            ListView.props.itemContainerStyle.height !== undefined
+          ? ListView.props.itemContainerStyle.height
           : 40,
     };
 
@@ -92,15 +150,21 @@ export default class ListView extends Component {
       ...itemLabelStyle,
     };
 
+    let CustomComponent = ListView.props.customComponent;
+
     return (
       <TouchableOpacity
         activeOpacity={0.6}
         key={Math.random}
         style={itemContainerStyle}
         onPress={() =>
-          this.props.onInnerItemClick(item.index, this.props.item)
+          ListView.props.onInnerItemClick(index, ListView.props.item)
         }>
-        <Text style={itemLabelStyle}>{item.item.name}</Text>
+        {CustomComponent !== undefined ? (
+          CustomComponent
+        ) : (
+          <Text style={itemLabelStyle}>{item.name}</Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -110,16 +174,16 @@ export default class ListView extends Component {
       headerContainerStyle,
       headerLabelStyle,
       headerImageIndicatorStyle,
-    } = this.props;
+    } = ListView.props;
     headerContainerStyle = {
       ...styles.header,
       ...headerContainerStyle,
       height:
-        this.props.item.item.cellHeight !== undefined
-          ? this.props.item.item.cellHeight
-          : this.props.headerContainerStyle !== undefined &&
-            this.props.headerContainerStyle.height !== undefined
-          ? this.props.headerContainerStyle.height
+        ListView.props.item.cellHeight !== undefined
+          ? ListView.props.item.cellHeight
+          : ListView.props.headerContainerStyle !== undefined &&
+            ListView.props.headerContainerStyle.height !== undefined
+          ? ListView.props.headerContainerStyle.height
           : 40,
     };
     headerLabelStyle = {
@@ -134,14 +198,14 @@ export default class ListView extends Component {
       <Fragment>
         <TouchableOpacity
           activeOpacity={0.6}
-          onPress={() => this.updateLayout(this.props.item.index)}
+          onPress={() => this.updateLayout(ListView.props.index)}
           style={headerContainerStyle}>
           <Animated.Image
             source={
-              this.props.customChevron !== undefined
-                ? this.props.customChevron
-                : this.props.chevronColor != undefined &&
-                  this.props.chevronColor == 'white'
+              ListView.props.customChevron !== undefined
+                ? ListView.props.customChevron
+                : ListView.props.chevronColor != undefined &&
+                  ListView.props.chevronColor == 'white'
                 ? chevronWhite
                 : chevronBlack
             }
@@ -149,14 +213,14 @@ export default class ListView extends Component {
             resizeMode="contain"
             style={[
               headerImageIndicatorStyle,
-              this.props.item.item.isExpanded && {
+              ListView.props.item.isExpanded && {
                 transform: [
                   {
                     rotate: this.state.rotateValueHolder.interpolate({
                       inputRange: [0, 1],
                       outputRange: [
                         '0deg',
-                        this.props.item.item.isExpanded ? '90deg' : '-90deg',
+                        ListView.props.item.isExpanded ? '90deg' : '-90deg',
                       ],
                     }),
                   },
@@ -165,7 +229,7 @@ export default class ListView extends Component {
             ]}
           />
           <Text style={headerLabelStyle}>
-            {this.props.item.item.categoryName}
+            {ListView.props.item.categoryName}
           </Text>
         </TouchableOpacity>
         <Animated.View
@@ -178,9 +242,9 @@ export default class ListView extends Component {
           ]}>
           <FlatList
             keyExtractor={() => Math.random().toString()}
-            listKey={() => this.props.item.item.id + this.props.item.index}
-            data={this.props.item.item.subCategory}
-            renderItem={(innerItem, index) => this.renderInnerItem(innerItem)}
+            listKey={() => ListView.props.item.id + ListView.props.index}
+            data={ListView.props.item.subCategory}
+            renderItem={({item}:{item: InnerItem}, {index}: {index: number}) => this.renderInnerItem(item, index)}
           />
         </Animated.View>
       </Fragment>
