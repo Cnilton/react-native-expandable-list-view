@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {View, Image} from 'react-native';
 
-import img from './src/ExpandableListView/assets/images/arrow_black.png'
+import img from './src/ExpandableListView/assets/images/arrow_black.png';
 
 import ExpandableListView from './src/ExpandableListView';
 
@@ -12,7 +12,10 @@ const CONTENT = [
   {
     isExpanded: false,
     categoryName: 'Item 1',
-    subCategory: [{id: 1, name: 'Sub Cat 1'}, {id: 3, name: 'Sub Cat 3'}],
+    subCategory: [
+      {id: 1, name: 'Sub Cat 1'},
+      {id: 3, name: 'Sub Cat 3'},
+    ],
   },
   {
     isExpanded: false,
@@ -21,7 +24,7 @@ const CONTENT = [
   },
 ];
 
-export default class Bla extends Component {
+export default class Expandable extends Component {
   state = {
     listDataSource: CONTENT,
   };
@@ -41,8 +44,7 @@ export default class Bla extends Component {
   render() {
     return (
       <ExpandableListView
-        
-        customComponent={<Image source={img} style={{height:100}}/>}
+        customComponent={<Image source={img} style={{height: 100}} />}
         data={this.state.listDataSource} // required
         onInnerItemClick={this.handleInnerClick.bind(this)} // required
         onItemClick={this.updateLayout.bind(this)} //required

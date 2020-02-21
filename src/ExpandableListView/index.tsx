@@ -1,64 +1,70 @@
 import React, {Component} from 'react';
 import {FlatList} from 'react-native';
 
-import {StyleSheet} from 'react-native'
-
 import ListView from './ListView';
 
-interface InnerItem{
+interface InnerItem {
   item: Object;
   index: number;
   name: String;
   innerCellHeight?: number;
 }
 
-interface Item extends Array<any>{
+interface Item extends Array<any> {
   isExpanded: Boolean;
   item: InnerItem;
   index: number;
   cellHeight?: number;
   categoryName: String;
   id: number;
-  subCategory: Array<InnerItem>
+  subCategory: Array<InnerItem>;
 }
 
-interface Props extends Object{
-  itemContainerStyle?: StyleSheet;
-  itemLabelStyle?: StyleSheet;
-  headerContainerStyle?: StyleSheet;
-  headerLabelStyle?: StyleSheet;
+interface Props extends Object {
+  /** Add styles to each inner item container */
+  itemContainerStyle?: Object;
+  /** Add styles to the label of the inner item */
+  itemLabelStyle?: Object;
+  /** Add styles to each item container */
+  headerContainerStyle?: Object;
+  /** Add styles to the label of the item */
+  headerLabelStyle?: Object;
+  /** Pass the component you want inside the expandable list */
   customComponent?: Component;
-  headerImageIndicatorStyle?: StyleSheet;
+  /** Add styles to image indicator */
+  headerImageIndicatorStyle?: Object;
+  /** Add your own indicator, by passing it's path */
   customChevron?: String;
-  chevronColor?: String;
-  item: Item;
-  index: number;
-  height?: number; 
+  /** Add styles to the label of the inner item */
+  chevronColor?: 'white' | 'black';
+  /** Data for the expandable list */
   data: Item;
+  /** Callback on inner item click */
   onInnerItemClick: Function;
+  /** Callback on item click */
   onItemClick: Function;
 }
 
-export default class ExpandableListView extends Component {
-
-  static props : Props
-
-  renderItem = (item: Item, index: number) => {
+export default class ExpandableListView extends Component<Props> {
+  props!: Props;
+  renderItem = (itemO: any) => {
+    let {item}: {item: Item} = itemO;
+    let {index}: {index: number} = itemO;
     return (
       <ListView
-        customComponent={ExpandableListView.props.customComponent}
-        headerImageIndicatorStyle={ExpandableListView.props.headerImageIndicatorStyle}
-        itemLabelStyle={ExpandableListView.props.itemLabelStyle}
-        itemContainerStyle={ExpandableListView.props.itemContainerStyle}
-        headerContainerStyle={ExpandableListView.props.headerContainerStyle}
-        headerLabelStyle={ExpandableListView.props.headerLabelStyle}
-        customChevron={ExpandableListView.props.customChevron}
-        chevronColor={ExpandableListView.props.chevronColor}
+        customComponent={this.props.customComponent}
+        headerImageIndicatorStyle={this.props.headerImageIndicatorStyle}
+        itemLabelStyle={this.props.itemLabelStyle}
+        itemContainerStyle={this.props.itemContainerStyle}
+        headerContainerStyle={this.props.headerContainerStyle}
+        headerLabelStyle={this.props.headerLabelStyle}
+        customChevron={this.props.customChevron}
+        chevronColor={this.props.chevronColor}
         item={item}
         index={index}
-        data={ExpandableListView.props.data}
-        onItemClick={ExpandableListView.props.onItemClick}
-        onInnerItemClick={ExpandableListView.props.onInnerItemClick}
+        data={this.props.data}
+        onItemClick={this.props.onItemClick}
+        onInnerItemClick={this.props.onInnerItemClick}
       />
     );
   };
@@ -67,8 +73,8 @@ export default class ExpandableListView extends Component {
     return (
       <FlatList
         keyExtractor={({index}: {index: number}) => index.toString()}
-        data={ExpandableListView.props.data}
-        renderItem={({item}:{item: Item}, {index}: {index: number}) => this.renderItem(item, index)}
+        data={this.props.data}
+        renderItem={item => this.renderItem(item)}
       />
     );
   }

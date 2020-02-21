@@ -2,54 +2,53 @@ import React, {Component, Fragment} from 'react';
 
 import {TouchableOpacity, Animated, FlatList, Text, Easing} from 'react-native';
 
-import {StyleSheet} from 'react-native'
-
 import styles from '../styles';
 
-import chevronWhite from '../assets/images/arrow_white.png';
-import chevronBlack from '../assets/images/arrow_black.png';
+interface Style extends Object {
+  height?: number;
+}
 
-interface State extends Object{
+interface State extends Object {
   index: number;
   rotateValueHolder: Animated.Value;
   animatedValue: Animated.Value;
 }
 
-interface Item extends Array<any>{
+interface Item extends Array<any> {
   isExpanded: Boolean;
   item: InnerItem;
   index: number;
   cellHeight?: number;
   categoryName: String;
   id: number;
-  subCategory: Array<InnerItem>
+  subCategory: Array<InnerItem>;
 }
 
-interface InnerItem{
+interface InnerItem extends Object {
   item: Object;
   index: number;
   name: String;
   innerCellHeight?: number;
 }
 
-interface Props extends Object{
-  itemContainerStyle?: StyleSheet;
-  itemLabelStyle?: StyleSheet;
-  headerContainerStyle?: StyleSheet;
-  headerLabelStyle?: StyleSheet;
+interface Props extends Object {
+  itemContainerStyle?: Style;
+  itemLabelStyle?: Style;
+  headerContainerStyle?: Style;
+  headerLabelStyle?: Style;
   customComponent?: Component;
-  headerImageIndicatorStyle?: StyleSheet;
+  headerImageIndicatorStyle?: Style;
   customChevron?: String;
   chevronColor?: String;
   item: Item;
   index: number;
-  height?: number; 
+  height?: number;
   data: Item;
   onInnerItemClick: Function;
   onItemClick: Function;
 }
 
-interface Types extends Object{
+interface Types extends Object {
   props: Props;
   value: Boolean;
   setState: Function;
@@ -64,29 +63,28 @@ interface Types extends Object{
   checkImage?: String;
 }
 
-export default class ListView extends Component<Types> {
-
-  static props: Props
-  static setState: Function;
+export default class ListView extends Component<Props> {
+  props!: Props;
+  // setState!: Function;
 
   state = {
-    data: ListView.props.data,
+    data: this.props.data,
     index: null,
     animatedValue: new Animated.Value(0),
     rotateValueHolder: new Animated.Value(0),
-  }
+  };
 
   updateLayout = (index: number) => {
-    const array = [ListView.props.data];
+    const array = [this.props.data];
     array.map((value, placeindex) => {
       if (placeindex === index) {
         array[placeindex].isExpanded = !array[placeindex].isExpanded;
-        ListView.setState({index: index});
+        this.setState({index: index});
       } else {
         array[placeindex].isExpanded = false;
       }
     });
-    return ListView.props.onItemClick(array);
+    return this.props.onItemClick(array);
   };
 
   static getDerivedStateFromProps(props: Props, state: State) {
@@ -106,7 +104,6 @@ export default class ListView extends Component<Types> {
         Animated.spring(state.animatedValue, {
           friction: 10,
           toValue: height,
-          easing: Easing.linear,
         }).start();
         Animated.timing(state.rotateValueHolder, {
           toValue: 1,
@@ -118,7 +115,6 @@ export default class ListView extends Component<Types> {
         Animated.spring(state.animatedValue, {
           friction: 10,
           toValue: 0,
-          easing: Easing.linear,
         }).start();
         Animated.timing(state.rotateValueHolder, {
           toValue: 1,
@@ -131,17 +127,19 @@ export default class ListView extends Component<Types> {
     return null;
   }
 
-  renderInnerItem = (item: InnerItem, index: number) => {
-    let {itemContainerStyle, itemLabelStyle} = ListView.props;
+  renderInnerItem = (innerItem: any) => {
+    let {item}: {item: InnerItem} = innerItem;
+    let {index}: {index: number} = innerItem;
+    let {itemContainerStyle, itemLabelStyle} = this.props;
     itemContainerStyle = {
       ...styles.content,
       ...itemContainerStyle,
       height:
         item.innerCellHeight !== undefined
           ? item.innerCellHeight
-          : ListView.props.itemContainerStyle !== undefined &&
-            ListView.props.itemContainerStyle.height !== undefined
-          ? ListView.props.itemContainerStyle.height
+          : this.props.itemContainerStyle !== undefined &&
+            this.props.itemContainerStyle.height !== undefined
+          ? this.props.itemContainerStyle.height
           : 40,
     };
 
@@ -150,16 +148,14 @@ export default class ListView extends Component<Types> {
       ...itemLabelStyle,
     };
 
-    let CustomComponent = ListView.props.customComponent;
+    let CustomComponent = this.props.customComponent;
 
     return (
       <TouchableOpacity
         activeOpacity={0.6}
-        key={Math.random}
+        key={Math.random()}
         style={itemContainerStyle}
-        onPress={() =>
-          ListView.props.onInnerItemClick(index, ListView.props.item)
-        }>
+        onPress={() => this.props.onInnerItemClick(index, this.props.item)}>
         {CustomComponent !== undefined ? (
           CustomComponent
         ) : (
@@ -174,16 +170,16 @@ export default class ListView extends Component<Types> {
       headerContainerStyle,
       headerLabelStyle,
       headerImageIndicatorStyle,
-    } = ListView.props;
+    } = this.props;
     headerContainerStyle = {
       ...styles.header,
       ...headerContainerStyle,
       height:
-        ListView.props.item.cellHeight !== undefined
-          ? ListView.props.item.cellHeight
-          : ListView.props.headerContainerStyle !== undefined &&
-            ListView.props.headerContainerStyle.height !== undefined
-          ? ListView.props.headerContainerStyle.height
+        this.props.item.cellHeight !== undefined
+          ? this.props.item.cellHeight
+          : this.props.headerContainerStyle !== undefined &&
+            this.props.headerContainerStyle.height !== undefined
+          ? this.props.headerContainerStyle.height
           : 40,
     };
     headerLabelStyle = {
@@ -198,29 +194,29 @@ export default class ListView extends Component<Types> {
       <Fragment>
         <TouchableOpacity
           activeOpacity={0.6}
-          onPress={() => this.updateLayout(ListView.props.index)}
+          onPress={() => this.updateLayout(this.props.index)}
           style={headerContainerStyle}>
           <Animated.Image
             source={
-              ListView.props.customChevron !== undefined
-                ? ListView.props.customChevron
-                : ListView.props.chevronColor != undefined &&
-                  ListView.props.chevronColor == 'white'
-                ? chevronWhite
-                : chevronBlack
+              this.props.customChevron !== undefined
+                ? this.props.customChevron
+                : this.props.chevronColor !== undefined &&
+                  this.props.chevronColor === 'white'
+                ? require('../assets/images/arrow_white.png')
+                : require('../assets/images/arrow_black.png')
             }
             resizeMethod="scale"
             resizeMode="contain"
             style={[
               headerImageIndicatorStyle,
-              ListView.props.item.isExpanded && {
+              this.props.item.isExpanded && {
                 transform: [
                   {
                     rotate: this.state.rotateValueHolder.interpolate({
                       inputRange: [0, 1],
                       outputRange: [
                         '0deg',
-                        ListView.props.item.isExpanded ? '90deg' : '-90deg',
+                        this.props.item.isExpanded ? '90deg' : '-90deg',
                       ],
                     }),
                   },
@@ -228,9 +224,7 @@ export default class ListView extends Component<Types> {
               },
             ]}
           />
-          <Text style={headerLabelStyle}>
-            {ListView.props.item.categoryName}
-          </Text>
+          <Text style={headerLabelStyle}>{this.props.item.categoryName}</Text>
         </TouchableOpacity>
         <Animated.View
           style={[
@@ -242,9 +236,9 @@ export default class ListView extends Component<Types> {
           ]}>
           <FlatList
             keyExtractor={() => Math.random().toString()}
-            listKey={() => ListView.props.item.id + ListView.props.index}
-            data={ListView.props.item.subCategory}
-            renderItem={({item}:{item: InnerItem}, {index}: {index: number}) => this.renderInnerItem(item, index)}
+            listKey={String(this.props.item.id + this.props.index)}
+            data={this.props.item.subCategory}
+            renderItem={item => this.renderInnerItem(item)}
           />
         </Animated.View>
       </Fragment>
