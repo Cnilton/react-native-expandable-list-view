@@ -25,17 +25,19 @@ yarn add react-native-expandable-listview
 
 const CONTENT = [
   {
+    id: 1 // required, id of item
     isExpanded: false, // required, says wich one of the list has to expand or not
-    categoryName: 'Item 1', // required, label of item expandable item
+    categoryName: 'Item 1', // label of item expandable item
     subCategory: [ // required, array containing inner objects
         {
-            id: 1, // required, of inner object
+            id: 3, // required, of inner object
             name: 'Sub Cat 1', // required, label of inner object
         }, 
-      {id: 3, name: 'Sub Cat 3'},
+      {id: 4, name: 'Sub Cat 3'},
     ],
   },
   {
+    id: 2,
     isExpanded: false,
     categoryName: 'Item 8',
     subCategory: [{id: 22, name: 'Sub Cat 22',}],
@@ -53,6 +55,7 @@ import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
+    id: 42,
     isExpanded: false,
     categoryName: 'Item 1',
     subCategory: [
@@ -61,6 +64,7 @@ const CONTENT = [
     ],
   },
   {
+    id: 96,
     isExpanded: false,
     categoryName: 'Item 8',
     subCategory: [{id: 22, name: 'Sub Cat 22',}],
@@ -79,8 +83,8 @@ export default class YourComponent extends Component {
         });
     };
 
-    handleInnerClick = (innerIndex, headerItem) => { // required
-        console.log(item.item.name);
+    handleInnerClick = (innerIndex, innerItem) => { // required
+        console.log(innerItem);
     };
 
     render() {
@@ -99,34 +103,30 @@ export default class YourComponent extends Component {
 
 ```javascript
 //...
-
+import {Text} from 'react-native';
 import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
-    isExpanded: false,
-    categoryName: 'Item 1',
-    subCategory: [
-      {id: 1, name: 'Sub Cat 1', innerCellHeight: 40,},
-      {id: 3, name: 'Sub Cat 3'},
-    ],
-  },
-  {
+    id: 96,
+    customItem: <Text>Custom Item</Text>, // if your want to add your custom component to item
     cellHeight: 80, // if you want different height in specific Item of List
     isExpanded: false,
     categoryName: 'Item 2',
     subCategory: [
-      {id: 4, name: 'Sub Cat 4', innerCellHeight: 60,}, // if you want different height  in specific inner Item of specific item of List
-      {id: 5, name: 'Sub Cat 5',innerCellHeight: 40,},
+      {id: 4, name: 'Sub Cat 4', customInnerItem: <Text>Custom Inner Item</Text>,}, // if your want to add your custom component to inner item
+      {id: 5, name: 'Sub Cat 5',innerCellHeight: 40,}, // if you want different height in specific inner Item of specific inner item of List
     ],
   },
   {
+    id: 25,
     cellHeight: 40,
     isExpanded: false,
     categoryName: 'Item 7',
     subCategory: [{id: 20, name: 'Sub Cat 20', innerCellHeight: 40,}],
   },
   {
+    id: 15,
     cellHeight: 40,
     isExpanded: false,
     categoryName: 'Item 8',
@@ -146,8 +146,8 @@ export default class YourComponent extends Component {
         });
     };
 
-    handleInnerClick = (innerIndex, headerItem) => {
-    console.log(item.item.name);
+    handleInnerClick = (innerIndex, innerItem) => {
+      console.log(innerItem);
     };
 
     render(){
@@ -156,7 +156,7 @@ export default class YourComponent extends Component {
           // headerContainerStyle={{}} // add your styles to all item container of your list
           // headerLabelStyle={{}} // add your styles to all item text of your list
           // customChevron={{}} // your custom image to the indicator
-          // chevronColor= "white" or "black" // select wich color of the default indicator
+          // chevronColor= // "white" or "black" select wich color of the default indicator
           // itemContainerStyle={{}} // add your styles to all inner item containers of your list
           // itemLabelStyle={{}} // add your styles to all inner item text of your list
           // headerImageIndicatorStyle={{}} // add your styles to the image indicator of your list

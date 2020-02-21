@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: '#000',
-    // paddingVertical: 10,
     paddingHorizontal: 16,
   },
   content: {
@@ -41,8 +40,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderBottomColor: '#808080',
     borderBottomWidth: 1,
-    paddingLeft: 10,
-    paddingRight: 10,
     backgroundColor: '#e5f5Ff',
   },
 });
