@@ -1,8 +1,8 @@
 {
   "name": "react-native-expandable-listview",
   "description": "A simple and customizable React Native ExpandableListView component.",
-  "version": "1.0.5",
-  "main": "index.js",
+  "version": "1.0.6",
+  "main": "index.tsx",
   "private": false,
   "repository": {
     "type": "git",
