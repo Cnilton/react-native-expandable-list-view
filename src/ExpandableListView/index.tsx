@@ -150,9 +150,7 @@ export default class ExpandableListView extends Component<Props> {
     return null;
   }
 
-  renderInnerItem = (itemO: any, headerItemO: any) => {
-    let {headerItem}: {headerItem: Item} = headerItemO;
-    let {headerIndex}: {headerIndex: number} = headerItemO;
+  renderInnerItem = (itemO: any, headerItem: Item, headerIndex: number) => {
     let {item}: {item: InnerItem} = itemO;
     let {index}: {index: number} = itemO;
     let {itemContainerStyle, itemLabelStyle} = this.props;
@@ -270,7 +268,7 @@ export default class ExpandableListView extends Component<Props> {
             listKey={String(item.id + index)}
             data={item.subCategory}
             renderItem={(innerItem: any) =>
-              this.renderInnerItem(innerItem, itemO)
+              this.renderInnerItem(innerItem, item, index)
             }
           />
         </Animated.View>
