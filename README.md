@@ -83,8 +83,8 @@ export default class YourComponent extends Component {
         });
     };
 
-    handleInnerClick = (innerIndex, innerItem) => { // required
-        console.log(innerItem);
+    handleInnerClick = (innerIndex, headerItem, headerIndex) => { // required
+        console.log(innerIndex);
     };
 
     render() {
@@ -146,8 +146,8 @@ export default class YourComponent extends Component {
         });
     };
 
-    handleInnerClick = (innerIndex, innerItem) => {
-      console.log(innerItem);
+    handleInnerClick = (innerIndex, headerItem, headerIndex) => {
+      console.log(innerIndex);
     };
 
     render(){
