@@ -42,8 +42,6 @@ interface Props {
   itemContainerStyle?: Style;
   /** Add style to each inner item label */
   itemLabelStyle: Object;
-  /** Add your custom component to inner Items */
-  customComponent: Component;
   /** Add style to each item container */
   headerContainerStyle?: Style;
   /** Add style to each item label */
@@ -152,7 +150,7 @@ export default class ExpandableListView extends Component<Props> {
     return null;
   }
 
-  renderInnerItem = (itemO: any) => {
+  renderInnerItem = (itemO: any, headerItem: any) => {
     let {item}: {item: InnerItem} = itemO;
     let {index}: {index: number} = itemO;
     let {itemContainerStyle, itemLabelStyle} = this.props;
@@ -180,7 +178,7 @@ export default class ExpandableListView extends Component<Props> {
         activeOpacity={0.6}
         key={Math.random()}
         style={itemContainerStyle}
-        onPress={() => this.props.onInnerItemClick(index, item)}>
+        onPress={() => this.props.onInnerItemClick(index, headerItem)}>
         {CustomComponent !== undefined ? (
           CustomComponent
         ) : (
@@ -267,7 +265,9 @@ export default class ExpandableListView extends Component<Props> {
             keyExtractor={() => Math.random().toString()}
             listKey={String(item.id + index)}
             data={item.subCategory}
-            renderItem={(innerItem: any) => this.renderInnerItem(innerItem)}
+            renderItem={(innerItem: any) =>
+              this.renderInnerItem(innerItem, item)
+            }
           />
         </Animated.View>
       </Fragment>
