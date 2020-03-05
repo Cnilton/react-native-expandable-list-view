@@ -30,6 +30,10 @@ interface State extends Object {
 
 interface Style extends Object {
   height?: number;
+  marginVertical?: number;
+  marginBottom?: number;
+  marginTop?: number;
+  margin?: number;
 }
 
 interface Props {
@@ -105,6 +109,34 @@ export default class ExpandableListView extends Component<Props> {
                 props.itemContainerStyle.height !== undefined
               ? props.itemContainerStyle.height
               : 40);
+          height =
+            height +
+            (props.itemContainerStyle !== undefined
+              ? props.itemContainerStyle.margin !== undefined
+                ? props.itemContainerStyle.margin * 2
+                : 0
+              : 0);
+          height =
+            height +
+            (props.itemContainerStyle !== undefined
+              ? props.itemContainerStyle.marginVertical !== undefined
+                ? props.itemContainerStyle.marginVertical * 2
+                : 0
+              : 0);
+          height =
+            height +
+            (props.itemContainerStyle !== undefined
+              ? props.itemContainerStyle.marginBottom !== undefined
+                ? props.itemContainerStyle.marginBottom
+                : 0
+              : 0);
+          height =
+            height +
+            (props.itemContainerStyle !== undefined
+              ? props.itemContainerStyle.marginTop !== undefined
+                ? props.itemContainerStyle.marginTop
+                : 0
+              : 0);
         });
         Animated.spring(state.animatedValues[state.index], {
           friction: 10,
@@ -233,8 +265,8 @@ export default class ExpandableListView extends Component<Props> {
                 source={
                   this.props.customChevron !== undefined
                     ? this.props.customChevron
-                    : this.props.chevronColor != undefined &&
-                      this.props.chevronColor == 'white'
+                    : this.props.chevronColor !== undefined &&
+                      this.props.chevronColor === 'white'
                     ? chevronWhite
                     : chevronBlack
                 }
