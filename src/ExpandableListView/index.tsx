@@ -116,7 +116,6 @@ export default class ExpandableListView extends Component<Props> {
       if (props.data[state.index].isExpanded) {
         let height = 0;
         props.data[state.index].subCategory.map(innerItem => {
-          console.log(10 / props.data[state.index].subCategory.length);
           height =
             height +
             (innerItem.innerCellHeight !== undefined
