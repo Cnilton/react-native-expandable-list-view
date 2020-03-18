@@ -1,6 +1,13 @@
 import React, {Component, Fragment} from 'react';
 
-import {TouchableOpacity, Animated, FlatList, Text, Easing} from 'react-native';
+import {
+  TouchableOpacity,
+  Animated,
+  FlatList,
+  Text,
+  Easing,
+  View,
+} from 'react-native';
 
 import styles from './styles';
 
@@ -56,6 +63,14 @@ interface Props {
   customChevron?: string;
   /** Color for default indicator */
   chevronColor?: 'white' | 'black';
+  /** Render separator for header items */
+  renderHeaderSeparator?: boolean;
+  /** Render separator for inner items */
+  renderInnerItemSeparator?: boolean;
+  /** Add style to the item separator */
+  headerSeparatorStyle?: Style;
+  /** Add style to the inner item separator */
+  innerItemSeparatorStyle?: Style;
   props: Object;
 }
 
@@ -101,6 +116,7 @@ export default class ExpandableListView extends Component<Props> {
       if (props.data[state.index].isExpanded) {
         let height = 0;
         props.data[state.index].subCategory.map(innerItem => {
+          console.log(10 / props.data[state.index].subCategory.length);
           height =
             height +
             (innerItem.innerCellHeight !== undefined
@@ -140,7 +156,17 @@ export default class ExpandableListView extends Component<Props> {
         });
         Animated.spring(state.animatedValues[state.index], {
           friction: 10,
-          toValue: height,
+          toValue:
+            height +
+            (props.renderInnerItemSeparator !== undefined &&
+            props.renderInnerItemSeparator
+              ? (props.innerItemSeparatorStyle !== undefined
+                  ? props.innerItemSeparatorStyle.height !== undefined
+                    ? props.innerItemSeparatorStyle.height
+                    : 1
+                  : 1) *
+                (props.data[state.index].subCategory.length - 1)
+              : 0),
         }).start();
         Animated.timing(state.rotateValueHolder[state.index], {
           toValue: 1,
@@ -185,7 +211,11 @@ export default class ExpandableListView extends Component<Props> {
   renderInnerItem = (itemO: any, headerItem: Item, headerIndex: number) => {
     let {item}: {item: InnerItem} = itemO;
     let {index}: {index: number} = itemO;
-    let {itemContainerStyle, itemLabelStyle} = this.props;
+    let {
+      itemContainerStyle,
+      itemLabelStyle,
+      innerItemSeparatorStyle,
+    } = this.props;
     itemContainerStyle = {
       ...styles.content,
       ...itemContainerStyle,
@@ -203,22 +233,34 @@ export default class ExpandableListView extends Component<Props> {
       ...itemLabelStyle,
     };
 
+    innerItemSeparatorStyle = {
+      ...styles.innerItemSeparator,
+      ...innerItemSeparatorStyle,
+    };
+
     let CustomComponent = item.customInnerItem;
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.6}
-        key={Math.random()}
-        style={itemContainerStyle}
-        onPress={() =>
-          this.props.onInnerItemClick(index, headerItem, headerIndex)
-        }>
-        {CustomComponent !== undefined ? (
-          CustomComponent
-        ) : (
-          <Text style={itemLabelStyle}>{item.name}</Text>
-        )}
-      </TouchableOpacity>
+      <Fragment>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          key={Math.random()}
+          style={itemContainerStyle}
+          onPress={() =>
+            this.props.onInnerItemClick(index, headerItem, headerIndex)
+          }>
+          {CustomComponent !== undefined ? (
+            CustomComponent
+          ) : (
+            <Text style={itemLabelStyle}>{item.name}</Text>
+          )}
+        </TouchableOpacity>
+        {this.props.renderInnerItemSeparator !== undefined &&
+          this.props.renderInnerItemSeparator &&
+          index < headerItem.subCategory.length - 1 && (
+            <View style={innerItemSeparatorStyle} />
+          )}
+      </Fragment>
     );
   };
 
@@ -229,6 +271,7 @@ export default class ExpandableListView extends Component<Props> {
       headerContainerStyle,
       headerLabelStyle,
       headerImageIndicatorStyle,
+      headerSeparatorStyle,
     } = this.props;
     headerContainerStyle = {
       ...styles.header,
@@ -248,6 +291,8 @@ export default class ExpandableListView extends Component<Props> {
     headerImageIndicatorStyle = {
       ...headerImageIndicatorStyle,
     };
+
+    headerSeparatorStyle = {...styles.headerSeparator, ...headerSeparatorStyle};
 
     let CustomComponent = item.customItem;
 
@@ -304,6 +349,9 @@ export default class ExpandableListView extends Component<Props> {
             }
           />
         </Animated.View>
+        {this.props.renderHeaderSeparator !== undefined &&
+          this.props.renderHeaderSeparator &&
+          !item.isExpanded && <View style={headerSeparatorStyle} />}
       </Fragment>
     );
   };

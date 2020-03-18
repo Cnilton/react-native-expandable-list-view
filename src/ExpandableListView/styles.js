@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#d5FCFF',
-    // padding: 16,
+    padding: 16,
   },
   headerText: {
     fontSize: 16,
@@ -41,6 +41,18 @@ const styles = StyleSheet.create({
     borderBottomColor: '#808080',
     borderBottomWidth: 1,
     backgroundColor: '#e5f5Ff',
+  },
+  headerSeparator: {
+    height: 1,
+    width: '95%',
+    backgroundColor: '#c1c2c3',
+    alignSelf: 'center',
+  },
+  innerItemSeparator: {
+    height: 1,
+    width: '95%',
+    backgroundColor: '#c1c2c3',
+    alignSelf: 'center',
   },
 });
 
