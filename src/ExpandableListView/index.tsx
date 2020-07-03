@@ -154,6 +154,7 @@ export default class ExpandableListView extends Component<Props> {
               : 0);
         });
         Animated.spring(state.animatedValues[state.index], {
+          useNativeDriver: false,
           friction: 10,
           toValue:
             height +
@@ -176,6 +177,7 @@ export default class ExpandableListView extends Component<Props> {
         for (let i = 0; i < state.animatedValues.length; i++) {
           if (!props.data[i].isExpanded) {
             Animated.spring(state.animatedValues[i], {
+              useNativeDriver: false,
               friction: 10,
               toValue: 0,
             }).start();
@@ -191,6 +193,7 @@ export default class ExpandableListView extends Component<Props> {
         for (let i = 0; i < state.animatedValues.length; i++) {
           if (!props.data[i].isExpanded) {
             Animated.spring(state.animatedValues[i], {
+              useNativeDriver: false,
               friction: 10,
               toValue: 0,
             }).start();

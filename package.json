@@ -1,7 +1,7 @@
 {
   "name": "react-native-expandable-listview",
   "description": "A simple and customizable React Native ExpandableListView component.",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "index.tsx",
   "private": false,
   "repository": {
@@ -35,11 +35,14 @@
     "react-native": "*"
   },
   "dependencies": {
-    "typescript": "*",
     "@types/jest": "*",
     "@types/react": "*",
     "@types/react-native": "*",
-    "@types/react-test-renderer": "*"
+    "@types/react-test-renderer": "*",
+    "acorn": "^7.3.1",
+    "logkitty": "^0.7.1",
+    "minimist": "^1.2.5",
+    "typescript": "*"
   },
   "bugs": {
     "url": "https://github.com/Cnilton/react-native-expandable-list-view/issues"
@@ -49,16 +52,16 @@
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^0.0.7",
+    "@types/jest": "*",
+    "@types/react": "*",
+    "@types/react-native": "*",
+    "@types/react-test-renderer": "*",
     "babel-jest": "^25.1.0",
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.58.0",
     "react-test-renderer": "16.9.0",
-    "typescript": "*",
-    "@types/jest": "*",
-    "@types/react": "*",
-    "@types/react-native": "*",
-    "@types/react-test-renderer": "*"
+    "typescript": "*"
   },
   "jest": {
     "preset": "react-native"
