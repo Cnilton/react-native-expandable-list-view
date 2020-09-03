@@ -12,23 +12,14 @@ const styles = StyleSheet.create({
   },
   header: {
     height: 50,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#d5FCFF',
+    backgroundColor: '#e5f5Ff',
     padding: 16,
   },
   headerText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#808080',
-    width: '100%',
-    marginLeft: 16,
-    marginRight: 16,
   },
   text: {
     fontSize: 16,
@@ -36,21 +27,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   content: {
-    height: 40,
     justifyContent: 'center',
-    borderBottomColor: '#808080',
-    borderBottomWidth: 1,
-    backgroundColor: '#e5f5Ff',
   },
   headerSeparator: {
     height: 1,
-    width: '95%',
+    width: '100%',
     backgroundColor: '#c1c2c3',
     alignSelf: 'center',
   },
   innerItemSeparator: {
     height: 1,
-    width: '95%',
+    width: '100%',
     backgroundColor: '#c1c2c3',
     alignSelf: 'center',
   },

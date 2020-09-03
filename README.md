@@ -22,17 +22,17 @@ yarn add react-native-expandable-listview
 ## Data Structure
 
 ```javascript
-
 const CONTENT = [
   {
-    id: 1 // required, id of item
+    id: 1, // required, id of item
     isExpanded: false, // required, says wich one of the list has to expand or not
     categoryName: 'Item 1', // label of item expandable item
-    subCategory: [ // required, array containing inner objects
-        {
-            id: 3, // required, of inner object
-            name: 'Sub Cat 1', // required, label of inner object
-        },
+    subCategory: [
+      // required, array containing inner objects
+      {
+        id: 3, // required, of inner object
+        name: 'Sub Cat 1', // required, label of inner object
+      },
       {id: 4, name: 'Sub Cat 3'},
     ],
   },
@@ -40,10 +40,9 @@ const CONTENT = [
     id: 2,
     isExpanded: false,
     categoryName: 'Item 8',
-    subCategory: [{id: 22, name: 'Sub Cat 22',}],
+    subCategory: [{id: 22, name: 'Sub Cat 22'}],
   },
 ];
-
 ```
 
 ## Basic Usage
@@ -58,10 +57,7 @@ const CONTENT = [
     id: 42,
     isExpanded: false,
     categoryName: 'Item 1',
-    subCategory: [
-      {id: 1, name: 'Sub Cat 1'},
-      {id: 3, name: 'Sub Cat 3'},
-    ],
+    subCategory: [{id: 1, name: 'Sub Cat 1'}, {id: 3, name: 'Sub Cat 3'}],
   },
   {
     id: 96,
@@ -76,15 +72,11 @@ export default class YourComponent extends Component {
     listDataSource: CONTENT,
   };
 
-  updateLayout = listDataSource => {
-    //required
-    this.setState({
-      listDataSource,
-    });
+  handleItemClick = index => {
+    console.log(index);
   };
 
-  handleInnerClick = (innerIndex, headerItem, headerIndex) => {
-    // required
+  handleInnerItemClick = (innerIndex, ItemItem, ItemIndex) => {
     console.log(innerIndex);
   };
 
@@ -92,8 +84,8 @@ export default class YourComponent extends Component {
     return (
       <ExpandableListView
         data={this.state.listDataSource} // required
-        onInnerItemClick={this.handleInnerClick.bind(this)} // required
-        onItemClick={this.updateLayout.bind(this)} //required
+        onInnerItemClick={this.handleInnerItemClick.bind(this)}
+        onItemClick={index => this.handleItemClick.bind(this)}
       />
     );
   }
@@ -144,13 +136,11 @@ export default class YourComponent extends Component {
     listDataSource: CONTENT,
   };
 
-  updateLayout = listDataSource => {
-    this.setState({
-      listDataSource,
-    });
+  handleItemClick = index => {
+    console.log(index);
   };
 
-  handleInnerClick = (innerIndex, headerItem, headerIndex) => {
+  handleInnerItemClick = (innerIndex, ItemItem, ItemIndex) => {
     console.log(innerIndex);
   };
 
@@ -158,17 +148,17 @@ export default class YourComponent extends Component {
     return (
       <ExpandableListView
         // renderInnerItemSeparator={false} // true or false, render separator between inner items
-        // renderHeaderSeparator={false} // true or false, render separator between headers
-        // headerContainerStyle={{}} // add your styles to all item container of your list
-        // headerLabelStyle={{}} // add your styles to all item text of your list
+        // renderItemSeparator={false} // true or false, render separator between Items
+        // itemContainerStyle={{}} // add your styles to all item container of your list
+        // itemLabelStyle={{}} // add your styles to all item text of your list
         // customChevron={{}} // your custom image to the indicator
         // chevronColor= // "white" or "black" select wich color of the default indicator
-        // itemContainerStyle={{}} // add your styles to all inner item containers of your list
+        // innerItemContainerStyle={{}} // add your styles to all inner item containers of your list
         // itemLabelStyle={{}} // add your styles to all inner item text of your list
-        // headerImageIndicatorStyle={{}} // add your styles to the image indicator of your list
+        // itemImageIndicatorStyle={{}} // add your styles to the image indicator of your list
         data={this.state.listDataSource}
-        onInnerItemClick={this.handleInnerClick.bind(this)}
-        onItemClick={this.updateLayout.bind(this)}
+        onInnerItemClick={this.handleInnerItemClick.bind(this)}
+        onItemClick={this.handleItemClick.bind(this)}
       />
     );
   }

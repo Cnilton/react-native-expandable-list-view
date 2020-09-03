@@ -2,7 +2,7 @@
   "name": "react-native-expandable-listview",
   "description": "A simple and customizable React Native ExpandableListView component.",
   "version": "1.0.14",
-  "main": "index.tsx",
+  "main": "index.ts",
   "private": false,
   "repository": {
     "type": "git",
@@ -30,11 +30,9 @@
   },
   "author": "Caio Nilton",
   "license": "MIT",
-  "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
-  },
   "dependencies": {
+    "react": "*",
+    "react-native": "*",
     "@types/jest": "*",
     "@types/react": "*",
     "@types/react-native": "*",
