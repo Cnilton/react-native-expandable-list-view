@@ -1,3 +1,3 @@
-import ExpandableListView from './src/ExpandableListView';
+import ExpandableListView from './src';
 
 export default ExpandableListView;
