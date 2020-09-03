@@ -47,9 +47,7 @@ const CONTENT = [
 
 ## Basic Usage
 
-<img src ="https://i.imgur.com/ZGcvwxy.gif" style="max-width: 30%;
-  height: auto;
-  background-size: contain;"/>
+<img src ="https://i.imgur.com/ZGcvwxy.gif" width="30%"/>
 
 ```javascript
 //...
@@ -108,9 +106,7 @@ export default class YourComponent extends Component {
 
 ## Advanced Usage
 
-<img src ="https://i.imgur.com/NXZs74t.gif" style="max-width: 30%;
-  height: auto;
-  background-size: contain;"/>
+<img src ="https://i.imgur.com/NXZs74t.gif" width="30%"/>
 
 ```javascript
 //...
