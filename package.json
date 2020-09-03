@@ -28,11 +28,13 @@
     "test": "jest",
     "lint": "eslint ."
   },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
   "author": "Caio Nilton",
   "license": "MIT",
   "dependencies": {
-    "react": "*",
-    "react-native": "*",
     "@types/jest": "*",
     "@types/react": "*",
     "@types/react-native": "*",
