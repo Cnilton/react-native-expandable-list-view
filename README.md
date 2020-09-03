@@ -47,9 +47,13 @@ const CONTENT = [
 
 ## Basic Usage
 
+<img src ="https://i.imgur.com/ZGcvwxy.gif" style="max-width: 30%;
+  height: auto;
+  background-size: contain;"/>
+
 ```javascript
 //...
-
+import React, {Component} from 'react';
 import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
@@ -57,13 +61,23 @@ const CONTENT = [
     id: 42,
     isExpanded: false,
     categoryName: 'Item 1',
-    subCategory: [{id: 1, name: 'Sub Cat 1'}, {id: 3, name: 'Sub Cat 3'}],
+    subCategory: [{id: 1, name: 'Sub Item 1'}, {id: 2, name: 'Sub Item 2'}],
   },
   {
     id: 96,
     isExpanded: false,
-    categoryName: 'Item 8',
-    subCategory: [{id: 22, name: 'Sub Cat 22'}],
+    categoryName: 'Item 2',
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
+  },
+  {
+    id: 12,
+    isExpanded: false,
+    categoryName: 'Item 3',
+    subCategory: [
+      {id: 1, name: 'Category 1'},
+      {id: 2, name: 'Category 2'},
+      {id: 3, name: 'Category 3'},
+    ],
   },
 ];
 
@@ -85,7 +99,7 @@ export default class YourComponent extends Component {
       <ExpandableListView
         data={this.state.listDataSource} // required
         onInnerItemClick={this.handleInnerItemClick.bind(this)}
-        onItemClick={index => this.handleItemClick.bind(this)}
+        onItemClick={this.handleItemClick.bind(this)}
       />
     );
   }
@@ -94,15 +108,35 @@ export default class YourComponent extends Component {
 
 ## Advanced Usage
 
+<img src ="https://i.imgur.com/NXZs74t.gif" style="max-width: 30%;
+  height: auto;
+  background-size: contain;"/>
+
 ```javascript
 //...
-import {Text} from 'react-native';
+import React, {Component} from 'react';
+import {Text, Image} from 'react-native';
 import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
     id: 96,
-    customItem: <Text>Custom Item</Text>, // if your want to add your custom component to item
+    customItem: (
+      <>
+        <Image
+          style={{
+            height: 20,
+            width: 20,
+            marginRight: 10,
+          }}
+          source={{
+            uri:
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Info_icon-72a7cf.svg/1200px-Info_icon-72a7cf.svg.png',
+          }}
+        />
+        <Text>Custom Item</Text>
+      </>
+    ), // if your want to add your custom component to item
     cellHeight: 80, // if you want different height in specific Item of List
     isExpanded: false,
     categoryName: 'Item 2',
@@ -110,7 +144,9 @@ const CONTENT = [
       {
         id: 4,
         name: 'Sub Cat 4',
-        customInnerItem: <Text>Custom Inner Item</Text>,
+        customInnerItem: (
+          <Text style={{textAlign: 'center'}}>Custom Inner Item</Text>
+        ),
       }, // if your want to add your custom component to inner item
       {id: 5, name: 'Sub Cat 5', innerCellHeight: 40}, // if you want different height in specific inner Item of specific inner item of List
     ],
