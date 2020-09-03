@@ -223,7 +223,6 @@ export const ExpandableListView: React.FC<Props> = props => {
                   : 2 * data[selectedIndex].subCategory.length
                 : 2) * data[selectedIndex].subCategory.length
             : 0);
-        console.log(height);
         Animated.spring(animatedValues[selectedIndex], {
           useNativeDriver: false,
           friction: 10,
