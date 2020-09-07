@@ -1,12 +1,15 @@
-import React, {Component, useState, useEffect, useMemo} from 'react';
+import React, {useEffect, useReducer, useMemo} from 'react';
 
 import {
   TouchableOpacity,
   Animated,
-  FlatList,
   Text,
   Easing,
   View,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
+  LayoutChangeEvent,
 } from 'react-native';
 
 import styles from './styles';
@@ -15,45 +18,23 @@ import chevronWhite from './assets/images/arrow_white.png';
 import chevronBlack from './assets/images/arrow_black.png';
 
 export interface InnerItem extends Object {
-  innerCellHeight?: number;
+  /**Inner Item id */
+  id: number;
+  /**Default text for Inner Item */
   name?: string;
-  customInnerItem?: Component;
+  /**Add your custom Inner Item */
+  customInnerItem?: JSX.Element;
 }
 
 export interface Item extends Object {
+  /**Item id */
   id: number;
-  cellHeight?: number;
-  isExpanded: boolean;
+  /**Inner Items */
   subCategory: InnerItem[];
+  /**Default text for Item */
   categoryName?: string;
-  customItem?: Component;
-}
-
-interface Style {
-  height?: number;
-  padding?: number;
-  paddingTop?: number;
-  paddingVertical?: number;
-  paddingBottom?: number;
-  marginVertical?: number;
-  marginBottom?: number;
-  marginTop?: number;
-  margin?: number;
-  fontSize?: number;
-  backgroundColor?: string;
-  fontWeight?:
-    | 'normal'
-    | 'bold'
-    | '100'
-    | '200'
-    | '300'
-    | '400'
-    | '500'
-    | '600'
-    | '700'
-    | '800'
-    | '900'
-    | undefined;
+  /**Add your custom Item */
+  customItem?: JSX.Element;
 }
 
 interface Props {
@@ -63,15 +44,15 @@ interface Props {
   /** Callback for inner item click */
   onInnerItemClick?: Function;
   /** Add style to each inner item container */
-  innerItemContainerStyle?: Style;
+  innerItemContainerStyle?: ViewStyle;
   /** Add style to each inner item label */
-  innerItemLabelStyle?: Style;
+  innerItemLabelStyle?: ViewStyle;
   /** Add style to each item container */
-  itemContainerStyle?: Style;
+  itemContainerStyle?: ViewStyle;
   /** Add style to each item label */
-  itemLabelStyle?: Style;
+  itemLabelStyle?: TextStyle;
   /** Add style to the item indicator */
-  itemImageIndicatorStyle?: Style;
+  itemImageIndicatorStyle?: ImageStyle;
   /** Pass the path for your custom indicator */
   customChevron?: string;
   /** Color for default indicator */
@@ -81,9 +62,9 @@ interface Props {
   /** Render separator for inner items */
   renderInnerItemSeparator?: boolean;
   /** Add style to the item separator */
-  itemSeparatorStyle?: Style;
+  itemSeparatorStyle?: ViewStyle;
   /** Add style to the inner item separator */
-  innerItemSeparatorStyle?: Style;
+  innerItemSeparatorStyle?: ViewStyle;
 }
 
 interface ExpandableListItem {
@@ -91,186 +72,197 @@ interface ExpandableListItem {
   index: number;
 }
 
+const initialState = {
+  opened: false,
+  height: [],
+  isMounted: [],
+  lastSelectedIndex: -1,
+  selectedIndex: -1,
+  opacityValues: [],
+  animatedValues: [],
+  rotateValueHolder: [],
+};
+
+function reducer(
+  state: any,
+  action: {
+    type: string;
+    opened?: boolean;
+    height?: [];
+    isMounted?: [];
+    lastSelectedIndex?: number;
+    selectedIndex?: number;
+    opacityValues?: Animated.Value[];
+    animatedValues?: Animated.Value[];
+    rotateValueHolder?: Animated.Value[];
+  },
+) {
+  switch (action.type) {
+    case 'set':
+      return {...state, ...action};
+    case 'reset':
+      return {
+        opened: false,
+        height: [],
+        isMounted: [],
+        lastSelectedIndex: -1,
+        selectedIndex: -1,
+        opacityValues: [],
+        animatedValues: [],
+        rotateValueHolder: [],
+      };
+    default:
+      return {...state};
+  }
+}
+
 export const ExpandableListView: React.FC<Props> = props => {
-  const [data, setData] = useState([] as Item[]);
-  const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [animatedValues, setAnimatedValues] = useState([] as Animated.Value[]);
-  const [rotateValueHolder, setRotateValueHolder] = useState(
-    [] as Animated.Value[],
-  );
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    setData(props.data);
-  }, [props.data]);
-
-  useEffect(() => {
-    let newAnimatedValues: Array<Animated.Value> = [];
-    let newRotateValueHolder: Array<Animated.Value> = [];
-    data.map(() => {
-      newAnimatedValues.push(new Animated.Value(0));
-      newRotateValueHolder.push(new Animated.Value(0));
-    });
-    setAnimatedValues(newAnimatedValues);
-    setRotateValueHolder(newRotateValueHolder);
-  }, [data]);
-
-  useEffect(() => {
-    if (selectedIndex >= 0 && data.length > 0) {
-      if (data[selectedIndex].isExpanded) {
-        let height = 0;
-        data[selectedIndex].subCategory.map((innerItem: any) => {
-          height =
-            height +
-            (innerItem.innerCellHeight !== undefined
-              ? innerItem.innerCellHeight
-              : props.innerItemContainerStyle !== undefined &&
-                props.innerItemContainerStyle.height !== undefined
-              ? props.innerItemContainerStyle.height
-              : 40);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.margin !== undefined
-                ? props.innerItemContainerStyle.margin * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.padding !== undefined
-                ? props.innerItemContainerStyle.padding * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.marginVertical !== undefined
-                ? props.innerItemContainerStyle.marginVertical * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.marginBottom !== undefined
-                ? props.innerItemContainerStyle.marginBottom
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.paddingVertical !== undefined
-                ? props.innerItemContainerStyle.paddingVertical * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.paddingBottom !== undefined
-                ? props.innerItemContainerStyle.paddingBottom
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.marginTop !== undefined
-                ? props.innerItemContainerStyle.marginTop
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemContainerStyle !== undefined
-              ? props.innerItemContainerStyle.paddingTop !== undefined
-                ? props.innerItemContainerStyle.paddingTop
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemLabelStyle !== undefined
-              ? props.innerItemLabelStyle.padding !== undefined
-                ? props.innerItemLabelStyle.padding * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemLabelStyle !== undefined
-              ? props.innerItemLabelStyle.paddingBottom !== undefined
-                ? props.innerItemLabelStyle.paddingBottom
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemLabelStyle !== undefined
-              ? props.innerItemLabelStyle.paddingVertical !== undefined
-                ? props.innerItemLabelStyle.paddingVertical * 2
-                : 0
-              : 0);
-          height =
-            height +
-            (props.innerItemLabelStyle !== undefined
-              ? props.innerItemLabelStyle.paddingTop !== undefined
-                ? props.innerItemLabelStyle.paddingTop
-                : 0
-              : 0);
-        });
-        height =
-          height +
-          (props.renderInnerItemSeparator !== undefined &&
-          props.renderInnerItemSeparator
-            ? (props.innerItemSeparatorStyle !== undefined
-                ? props.innerItemSeparatorStyle.height !== undefined
-                  ? props.innerItemSeparatorStyle.height
-                  : 2 * data[selectedIndex].subCategory.length
-                : 2) * data[selectedIndex].subCategory.length
-            : 0);
-        Animated.spring(animatedValues[selectedIndex], {
-          useNativeDriver: false,
-          friction: 10,
-          toValue: height,
-        }).start();
-        Animated.timing(rotateValueHolder[selectedIndex], {
-          toValue: 90,
-          duration: 200,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }).start();
+    if (state.selectedIndex >= 0) {
+      if (state.animatedValues[state.selectedIndex] !== undefined) {
+        if (state.selectedIndex !== state.lastSelectedIndex) {
+          if (
+            state.lastSelectedIndex >= 0 &&
+            state.lastSelectedIndex < props.data.length
+          ) {
+            Animated.parallel([
+              Animated.timing(state.animatedValues[state.lastSelectedIndex], {
+                useNativeDriver: false,
+                duration: 300,
+                easing: Easing.linear,
+                toValue: 0,
+              }),
+              Animated.timing(
+                state.rotateValueHolder[state.lastSelectedIndex],
+                {
+                  toValue: 0,
+                  duration: 300,
+                  easing: Easing.linear,
+                  useNativeDriver: true,
+                },
+              ),
+            ]).start();
+          }
+          Animated.parallel([
+            Animated.timing(state.animatedValues[state.selectedIndex], {
+              useNativeDriver: false,
+              duration: 300,
+              easing: Easing.linear,
+              toValue: state.height[state.selectedIndex],
+            }),
+            Animated.timing(state.rotateValueHolder[state.selectedIndex], {
+              toValue: 1,
+              duration: 300,
+              easing: Easing.linear,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        } else {
+          Animated.parallel([
+            Animated.timing(state.animatedValues[state.selectedIndex], {
+              useNativeDriver: false,
+              duration: 300,
+              easing: Easing.linear,
+              toValue:
+                state.opened &&
+                state.height !== undefined &&
+                state.height[state.selectedIndex] !== undefined
+                  ? state.height[state.selectedIndex]
+                  : 0,
+            }),
+            Animated.timing(state.rotateValueHolder[state.selectedIndex], {
+              toValue: state.opened ? 1 : 0,
+              duration: 300,
+              easing: Easing.linear,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }
+        dispatch({type: 'set', lastSelectedIndex: state.selectedIndex});
       }
-      setLastSelectedIndex(selectedIndex);
+    } else {
+      if (state.opacityValues.length === props.data.length) {
+        state.opacityValues.map((_: any, index: number) => {
+          Animated.timing(state.opacityValues[index], {
+            toValue: 1,
+            duration: 200,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }).start();
+        });
+      }
     }
   }, [
-    animatedValues,
-    rotateValueHolder,
-    selectedIndex,
-    lastSelectedIndex,
-    data,
-    props.innerItemLabelStyle,
-    props.renderInnerItemSeparator,
-    props.innerItemSeparatorStyle,
-    props.innerItemContainerStyle,
+    props.data.length,
+    state.height,
+    state.isMounted,
+    state.opened,
+    state.opacityValues,
+    state.animatedValues,
+    state.rotateValueHolder,
+    state.selectedIndex,
+    state.lastSelectedIndex,
   ]);
 
+  useEffect(() => {
+    dispatch({type: 'reset'});
+  }, [props.data.length]);
+
+  function handleLayout(evt: LayoutChangeEvent, index: number) {
+    if (
+      state.animatedValues[index] === undefined ||
+      !state.isMounted[index] ||
+      state.height.length < props.data.length ||
+      (state.animatedValues[index] === 0 &&
+        (evt.nativeEvent.layout.height !== 0 &&
+          state.height[index] !== evt.nativeEvent.layout.height))
+    ) {
+      let h = state.height;
+      h[index] = evt.nativeEvent.layout.height;
+      let m = state.isMounted;
+      m[index] = true;
+      let newOpacityValues: Array<Animated.Value> = [...state.opacityValues];
+      let newAnimatedValues: Array<Animated.Value> = [...state.animatedValues];
+      let newRotateValueHolder: Array<Animated.Value> = [
+        ...state.rotateValueHolder,
+      ];
+      newOpacityValues.push(new Animated.Value(0));
+      newAnimatedValues.push(new Animated.Value(0));
+      newRotateValueHolder.push(new Animated.Value(0));
+      dispatch({
+        type: 'set',
+        opacityValues: newOpacityValues,
+        animatedValues: newAnimatedValues,
+        rotateValueHolder: newRotateValueHolder,
+        height: h,
+        isMounted: m,
+      });
+    }
+  }
+
   function updateLayout(updatedIndex: number) {
-    const array = [...data];
-    array.map((value, placeindex) => {
-      if (placeindex === updatedIndex) {
-        array[placeindex].isExpanded = !array[placeindex].isExpanded;
-        setSelectedIndex(updatedIndex);
-      } else {
-        array[placeindex].isExpanded = false;
-      }
+    dispatch({
+      type: 'set',
+      opened: updatedIndex === state.selectedIndex ? !state.opened : true,
+      selectedIndex: updatedIndex,
     });
-    setData(array);
+
     if (props.onItemClick) {
       return props.onItemClick(updatedIndex);
     }
     return;
   }
 
-  const List = useMemo(() => FlatList, []);
+  const List = useMemo(() => Animated.FlatList, []);
 
   function renderInnerItem(itemO: any, headerItem: Item, headerIndex: number) {
     let {item}: {item: InnerItem} = itemO;
     let {index}: {index: number} = itemO;
+
+    let CustomComponent = item.customInnerItem;
+
     let {
       innerItemContainerStyle,
       innerItemLabelStyle,
@@ -280,58 +272,18 @@ export const ExpandableListView: React.FC<Props> = props => {
     let container = {
       ...styles.content,
       ...innerItemContainerStyle,
-      height:
-        (item.innerCellHeight !== undefined
-          ? item.innerCellHeight
-          : props.innerItemContainerStyle !== undefined &&
-            props.innerItemContainerStyle.height !== undefined
-          ? props.innerItemContainerStyle.height
-          : 40) +
-        (props.renderInnerItemSeparator !== undefined &&
-        props.renderInnerItemSeparator
-          ? props.innerItemSeparatorStyle !== undefined
-            ? props.innerItemSeparatorStyle.height !== undefined
-              ? props.innerItemSeparatorStyle.height
-              : 1
-            : 1
-          : 0) +
-        (props.innerItemContainerStyle !== undefined
-          ? props.innerItemContainerStyle.paddingTop !== undefined
-            ? props.innerItemContainerStyle.paddingTop
-            : 0
-          : 0) +
-        (props.innerItemContainerStyle !== undefined
-          ? props.innerItemContainerStyle.padding !== undefined
-            ? props.innerItemContainerStyle.padding * 2
-            : 0
-          : 0) +
-        (props.innerItemContainerStyle !== undefined
-          ? props.innerItemContainerStyle.paddingBottom !== undefined
-            ? props.innerItemContainerStyle.paddingBottom
-            : 0
-          : 0) +
-        (props.innerItemContainerStyle !== undefined
-          ? props.innerItemContainerStyle.paddingVertical !== undefined
-            ? props.innerItemContainerStyle.paddingVertical * 2
-            : 0
-          : 0) +
-        (props.innerItemLabelStyle !== undefined
-          ? props.innerItemLabelStyle.padding !== undefined
-            ? props.innerItemLabelStyle.padding * 2
-            : 0
-          : 0),
+      height: undefined,
     };
     innerItemLabelStyle = {
       ...styles.text,
       ...innerItemLabelStyle,
+      height: undefined,
     };
 
     innerItemSeparatorStyle = {
       ...styles.innerItemSeparator,
       ...innerItemSeparatorStyle,
     };
-
-    let CustomComponent = item.customInnerItem;
 
     return (
       <>
@@ -351,7 +303,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         </TouchableOpacity>
         {props.renderInnerItemSeparator !== undefined &&
           props.renderInnerItemSeparator &&
-          index < headerItem.subCategory.length - 1 && (
+          index < props.data.length - 1 && (
             <View style={innerItemSeparatorStyle} />
           )}
       </>
@@ -368,13 +320,7 @@ export const ExpandableListView: React.FC<Props> = props => {
     itemContainerStyle = {
       ...styles.header,
       ...itemContainerStyle,
-      height:
-        item.cellHeight !== undefined
-          ? item.cellHeight
-          : props.itemContainerStyle !== undefined &&
-            props.itemContainerStyle.height !== undefined
-          ? props.itemContainerStyle.height
-          : 40,
+      height: undefined,
     };
     itemLabelStyle = {
       ...styles.headerText,
@@ -389,7 +335,12 @@ export const ExpandableListView: React.FC<Props> = props => {
     let CustomComponent = item.customItem;
 
     return (
-      <>
+      <Animated.View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          height: undefined,
+          opacity: state.isMounted[index] ? state.opacityValues[index] : 0,
+        }}>
         <TouchableOpacity
           activeOpacity={0.6}
           onPress={() => updateLayout(index)}
@@ -411,11 +362,11 @@ export const ExpandableListView: React.FC<Props> = props => {
                 resizeMode="contain"
                 style={[
                   itemImageIndicatorStyle,
-                  rotateValueHolder[index] !== undefined && {
+                  state.rotateValueHolder[index] !== undefined && {
                     transform: [
                       {
-                        rotate: rotateValueHolder[index].interpolate({
-                          inputRange: [0, 90],
+                        rotate: state.rotateValueHolder[index].interpolate({
+                          inputRange: [0, 1],
                           outputRange: ['0deg', '90deg'],
                         }),
                       },
@@ -427,31 +378,39 @@ export const ExpandableListView: React.FC<Props> = props => {
             </>
           )}
         </TouchableOpacity>
+
         <Animated.View
           style={[
             // eslint-disable-next-line react-native/no-inline-styles
             {
-              height: animatedValues[index],
+              height: !state.isMounted
+                ? undefined
+                : state.animatedValues[index],
               overflow: 'hidden',
             },
-          ]}>
-          <FlatList
+          ]}
+          onLayout={(evt: any) => handleLayout(evt, index)}>
+          <List
+            style={{height: undefined}}
+            contentContainerStyle={{height: undefined}}
             updateCellsBatchingPeriod={50}
             initialNumToRender={20}
             windowSize={20}
             maxToRenderPerBatch={20}
             keyExtractor={() => Math.random().toString()}
-            listKey={String(item.id + index)}
+            listKey={String(Math.random())}
             data={item.subCategory}
             renderItem={(innerItem: any) =>
               renderInnerItem(innerItem, item, index)
             }
           />
         </Animated.View>
+
         {props.renderItemSeparator !== undefined &&
           props.renderItemSeparator &&
-          !item.isExpanded && <View style={itemSeparatorStyle} />}
-      </>
+          (!state.opened || state.selectedIndex !== index) &&
+          props.data.length > index + 1 && <View style={itemSeparatorStyle} />}
+      </Animated.View>
     );
   }
 
@@ -462,7 +421,7 @@ export const ExpandableListView: React.FC<Props> = props => {
       windowSize={20}
       maxToRenderPerBatch={20}
       keyExtractor={(item: any, itemIndex: number) => itemIndex.toString()}
-      data={data}
+      data={props.data}
       renderItem={(item: ExpandableListItem) => renderItem(item)}
     />
   );

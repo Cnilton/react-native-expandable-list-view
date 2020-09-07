@@ -25,7 +25,6 @@ yarn add react-native-expandable-listview
 const CONTENT = [
   {
     id: 1, // required, id of item
-    isExpanded: false, // required, says wich one of the list has to expand or not
     categoryName: 'Item 1', // label of item expandable item
     subCategory: [
       // required, array containing inner objects
@@ -33,12 +32,14 @@ const CONTENT = [
         id: 3, // required, of inner object
         name: 'Sub Cat 1', // required, label of inner object
       },
-      {id: 4, name: 'Sub Cat 3'},
+      {
+        id: 4,
+        name: 'Sub Cat 3',
+      },
     ],
   },
   {
     id: 2,
-    isExpanded: false,
     categoryName: 'Item 8',
     subCategory: [{id: 22, name: 'Sub Cat 22'}],
   },
@@ -47,7 +48,7 @@ const CONTENT = [
 
 ## Basic Usage
 
-<img src ="https://i.imgur.com/ZGcvwxy.gif" width="30%"/>
+<img src ="https://i.imgur.com/3erV2nG.gif" width="40%"/>
 
 ```javascript
 //...
@@ -57,25 +58,40 @@ import ExpandableListView from 'react-native-expandable-listview';
 const CONTENT = [
   {
     id: 42,
-    isExpanded: false,
     categoryName: 'Item 1',
-    subCategory: [{id: 1, name: 'Sub Item 1'}, {id: 2, name: 'Sub Item 2'}],
+    subCategory: [
+      {
+        id: 1,
+        name:
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged",
+      },
+      {id: 2, name: 'Sub Item 2'},
+    ],
   },
   {
-    id: 96,
-    isExpanded: false,
+    id: 95,
     categoryName: 'Item 2',
     subCategory: [{id: 1, name: 'Sub Item 1'}],
   },
   {
-    id: 12,
-    isExpanded: false,
+    id: 94,
     categoryName: 'Item 3',
-    subCategory: [
-      {id: 1, name: 'Category 1'},
-      {id: 2, name: 'Category 2'},
-      {id: 3, name: 'Category 3'},
-    ],
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
+  },
+  {
+    id: 93,
+    categoryName: 'Item 4',
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
+  },
+  {
+    id: 92,
+    categoryName: 'Item 5',
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
+  },
+  {
+    id: 96,
+    categoryName: 'Item 6',
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
   },
 ];
 
@@ -106,7 +122,7 @@ export default class YourComponent extends Component {
 
 ## Advanced Usage
 
-<img src ="https://i.imgur.com/NXZs74t.gif" width="30%"/>
+<img src ="https://i.imgur.com/PladoVm.gif" width="40%"/>
 
 ```javascript
 //...
@@ -116,50 +132,43 @@ import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
-    id: 96,
+    id: 42,
+    categoryName: 'Item 1',
     customItem: (
-      <>
-        <Image
-          style={{
-            height: 20,
-            width: 20,
-            marginRight: 10,
-          }}
-          source={{
-            uri:
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Info_icon-72a7cf.svg/1200px-Info_icon-72a7cf.svg.png',
-          }}
-        />
+      <View style={{flexDirection: 'column'}}>
         <Text>Custom Item</Text>
-      </>
-    ), // if your want to add your custom component to item
-    cellHeight: 80, // if you want different height in specific Item of List
-    isExpanded: false,
-    categoryName: 'Item 2',
+        <Text>With</Text>
+        <Text>what you</Text>
+        <Text>want</Text>
+      </View>
+    ),
     subCategory: [
       {
-        id: 4,
-        name: 'Sub Cat 4',
         customInnerItem: (
-          <Text style={{textAlign: 'center'}}>Custom Inner Item</Text>
+          <View style={{flexDirection: 'column', marginLeft: 15}}>
+            <Text>Inner Item</Text>
+            <Text>With whatever you need</Text>
+          </View>
         ),
-      }, // if your want to add your custom component to inner item
-      {id: 5, name: 'Sub Cat 5', innerCellHeight: 40}, // if you want different height in specific inner Item of specific inner item of List
+        id: 1,
+        name: '',
+      },
+      {id: 2, name: 'Sub Item 2'},
     ],
   },
   {
-    id: 25,
-    cellHeight: 40,
-    isExpanded: false,
-    categoryName: 'Item 7',
-    subCategory: [{id: 20, name: 'Sub Cat 20', innerCellHeight: 40}],
+    id: 96,
+    categoryName: 'Item 2',
+    subCategory: [{id: 1, name: 'Sub Item 1'}],
   },
   {
-    id: 15,
-    cellHeight: 40,
-    isExpanded: false,
-    categoryName: 'Item 8',
-    subCategory: [{id: 22, name: 'Sub Cat 22', innerCellHeight: 40}],
+    id: 12,
+    categoryName: 'Item 3',
+    subCategory: [
+      {id: 1, name: 'Category 1'},
+      {id: 2, name: 'Category 2'},
+      {id: 3, name: 'Category 3'},
+    ],
   },
 ];
 
