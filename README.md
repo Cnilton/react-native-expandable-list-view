@@ -181,7 +181,7 @@ export default class YourComponent extends Component {
     console.log(index);
   };
 
-  handleInnerItemClick = (innerIndex, ItemItem, ItemIndex) => {
+  handleInnerItemClick = (innerIndex, item, itemIndex) => {
     console.log(innerIndex);
   };
 
