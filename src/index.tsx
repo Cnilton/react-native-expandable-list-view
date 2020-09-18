@@ -10,6 +10,7 @@ import {
   TextStyle,
   ImageStyle,
   LayoutChangeEvent,
+  FlatList,
 } from 'react-native';
 
 import styles from './styles';
@@ -65,6 +66,8 @@ interface Props {
   itemSeparatorStyle?: ViewStyle;
   /** Add style to the inner item separator */
   innerItemSeparatorStyle?: ViewStyle;
+  /** Set Animation on/off, default on */
+  animated?: boolean;
 }
 
 interface ExpandableListItem {
@@ -195,9 +198,8 @@ export const ExpandableListView: React.FC<Props> = props => {
       }
     }
   }, [
-    props.data.length,
+    props.data,
     state.height,
-    state.isMounted,
     state.opened,
     state.opacityValues,
     state.animatedValues,
@@ -208,16 +210,15 @@ export const ExpandableListView: React.FC<Props> = props => {
 
   useEffect(() => {
     dispatch({type: 'reset'});
-  }, [props.data.length]);
+  }, [props.data]);
 
   function handleLayout(evt: LayoutChangeEvent, index: number) {
     if (
-      state.animatedValues[index] === undefined ||
-      !state.isMounted[index] ||
-      state.height.length < props.data.length ||
-      (state.animatedValues[index] === 0 &&
-        (evt.nativeEvent.layout.height !== 0 &&
-          state.height[index] !== evt.nativeEvent.layout.height))
+      !state.isMounted[index] &&
+      evt.nativeEvent.layout.height !== 0
+      // &&
+      // (props.animated === undefined ||
+      //   !(props.animated !== undefined && !props.animated))
     ) {
       let h = state.height;
       h[index] = evt.nativeEvent.layout.height;
@@ -231,6 +232,7 @@ export const ExpandableListView: React.FC<Props> = props => {
       newOpacityValues.push(new Animated.Value(0));
       newAnimatedValues.push(new Animated.Value(0));
       newRotateValueHolder.push(new Animated.Value(0));
+
       dispatch({
         type: 'set',
         opacityValues: newOpacityValues,
@@ -255,7 +257,7 @@ export const ExpandableListView: React.FC<Props> = props => {
     return;
   }
 
-  const List = useMemo(() => Animated.FlatList, []);
+  const List = useMemo(() => FlatList, []);
 
   function renderInnerItem(itemO: any, headerItem: Item, headerIndex: number) {
     let {item}: {item: InnerItem} = itemO;
@@ -333,13 +335,18 @@ export const ExpandableListView: React.FC<Props> = props => {
     itemSeparatorStyle = {...styles.headerSeparator, ...itemSeparatorStyle};
 
     let CustomComponent = item.customItem;
-
     return (
       <Animated.View
         // eslint-disable-next-line react-native/no-inline-styles
         style={{
           height: undefined,
-          opacity: state.isMounted[index] ? state.opacityValues[index] : 0,
+          opacity:
+            props.animated === undefined ||
+            (props.animated !== undefined && props.animated)
+              ? state.isMounted[index]
+                ? state.opacityValues[index]
+                : 0
+              : 1,
         }}>
         <TouchableOpacity
           activeOpacity={0.6}
@@ -362,16 +369,28 @@ export const ExpandableListView: React.FC<Props> = props => {
                 resizeMode="contain"
                 style={[
                   itemImageIndicatorStyle,
-                  state.rotateValueHolder[index] !== undefined && {
-                    transform: [
-                      {
-                        rotate: state.rotateValueHolder[index].interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ['0deg', '90deg'],
-                        }),
+                  props.animated === undefined ||
+                  (props.animated !== undefined && props.animated)
+                    ? state.rotateValueHolder[index] !== undefined && {
+                        transform: [
+                          {
+                            rotate: state.rotateValueHolder[index].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: ['0deg', '90deg'],
+                            }),
+                          },
+                        ],
+                      }
+                    : {
+                        transform: [
+                          {
+                            rotate:
+                              state.opened && index === state.selectedIndex
+                                ? '90deg'
+                                : '0deg',
+                          },
+                        ],
                       },
-                    ],
-                  },
                 ]}
               />
               <Text style={itemLabelStyle}>{item.categoryName}</Text>
@@ -381,16 +400,26 @@ export const ExpandableListView: React.FC<Props> = props => {
 
         <Animated.View
           style={[
-            // eslint-disable-next-line react-native/no-inline-styles
-            {
-              height: !state.isMounted
-                ? undefined
-                : state.animatedValues[index],
-              overflow: 'hidden',
-            },
+            props.animated === undefined ||
+            (props.animated !== undefined && props.animated)
+              ? // eslint-disable-next-line react-native/no-inline-styles
+                {
+                  height: !state.isMounted
+                    ? undefined
+                    : state.animatedValues[index],
+                  overflow: 'hidden',
+                }
+              : // eslint-disable-next-line react-native/no-inline-styles
+                {
+                  display:
+                    state.opened && index === state.selectedIndex
+                      ? 'flex'
+                      : 'none',
+                  overflow: 'hidden',
+                },
           ]}
           onLayout={(evt: any) => handleLayout(evt, index)}>
-          <List
+          <FlatList
             style={{height: undefined}}
             contentContainerStyle={{height: undefined}}
             updateCellsBatchingPeriod={50}
