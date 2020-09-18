@@ -197,6 +197,7 @@ export default class YourComponent extends Component {
         // innerItemContainerStyle={{}} // add your styles to all inner item containers of your list
         // itemLabelStyle={{}} // add your styles to all inner item text of your list
         // itemImageIndicatorStyle={{}} // add your styles to the image indicator of your list
+        // animated={true} // sets all animations on/off, default on
         data={this.state.listDataSource}
         onInnerItemClick={this.handleInnerItemClick.bind(this)}
         onItemClick={this.handleItemClick.bind(this)}
