@@ -78,6 +78,7 @@ interface ExpandableListItem {
 const initialState = {
   opened: false,
   height: [],
+  data: [],
   isMounted: [],
   lastSelectedIndex: -1,
   selectedIndex: -1,
@@ -90,6 +91,7 @@ function reducer(
   state: any,
   action: {
     type: string;
+    data?: Item[];
     opened?: boolean;
     height?: [];
     isMounted?: [];
@@ -107,6 +109,7 @@ function reducer(
       return {
         opened: false,
         height: [],
+        data: [],
         isMounted: [],
         lastSelectedIndex: -1,
         selectedIndex: -1,
@@ -128,7 +131,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         if (state.selectedIndex !== state.lastSelectedIndex) {
           if (
             state.lastSelectedIndex >= 0 &&
-            state.lastSelectedIndex < props.data.length
+            state.lastSelectedIndex < state.data.length
           ) {
             Animated.parallel([
               Animated.timing(state.animatedValues[state.lastSelectedIndex], {
@@ -186,7 +189,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         dispatch({type: 'set', lastSelectedIndex: state.selectedIndex});
       }
     } else {
-      if (state.opacityValues.length === props.data.length) {
+      if (state.opacityValues.length === state.data.length) {
         state.opacityValues.map((_: any, index: number) => {
           Animated.timing(state.opacityValues[index], {
             toValue: 1,
@@ -198,7 +201,7 @@ export const ExpandableListView: React.FC<Props> = props => {
       }
     }
   }, [
-    props.data,
+    state.data,
     state.height,
     state.opened,
     state.opacityValues,
@@ -209,17 +212,15 @@ export const ExpandableListView: React.FC<Props> = props => {
   ]);
 
   useEffect(() => {
-    dispatch({type: 'reset'});
+    async function reset() {
+      await dispatch({type: 'reset'});
+      await dispatch({type: 'set', data: props.data});
+    }
+    reset();
   }, [props.data]);
 
   function handleLayout(evt: LayoutChangeEvent, index: number) {
-    if (
-      !state.isMounted[index] &&
-      evt.nativeEvent.layout.height !== 0
-      // &&
-      // (props.animated === undefined ||
-      //   !(props.animated !== undefined && !props.animated))
-    ) {
+    if (!state.isMounted[index] && evt.nativeEvent.layout.height !== 0) {
       let h = state.height;
       h[index] = evt.nativeEvent.layout.height;
       let m = state.isMounted;
@@ -305,7 +306,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         </TouchableOpacity>
         {props.renderInnerItemSeparator !== undefined &&
           props.renderInnerItemSeparator &&
-          index < props.data.length - 1 && (
+          index < state.data.length - 1 && (
             <View style={innerItemSeparatorStyle} />
           )}
       </>
@@ -404,7 +405,7 @@ export const ExpandableListView: React.FC<Props> = props => {
             (props.animated !== undefined && props.animated)
               ? // eslint-disable-next-line react-native/no-inline-styles
                 {
-                  height: !state.isMounted
+                  height: !state.isMounted[index]
                     ? undefined
                     : state.animatedValues[index],
                   overflow: 'hidden',
@@ -438,7 +439,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         {props.renderItemSeparator !== undefined &&
           props.renderItemSeparator &&
           (!state.opened || state.selectedIndex !== index) &&
-          props.data.length > index + 1 && <View style={itemSeparatorStyle} />}
+          state.data.length > index + 1 && <View style={itemSeparatorStyle} />}
       </Animated.View>
     );
   }
@@ -450,7 +451,7 @@ export const ExpandableListView: React.FC<Props> = props => {
       windowSize={20}
       maxToRenderPerBatch={20}
       keyExtractor={(item: any, itemIndex: number) => itemIndex.toString()}
-      data={props.data}
+      data={state.data}
       renderItem={(item: ExpandableListItem) => renderItem(item)}
     />
   );
