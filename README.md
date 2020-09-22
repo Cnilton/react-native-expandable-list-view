@@ -24,24 +24,24 @@ yarn add react-native-expandable-listview
 ```javascript
 const CONTENT = [
   {
-    id: 1, // required, id of item
+    id: '1', // required, id of item
     categoryName: 'Item 1', // label of item expandable item
     subCategory: [
       // required, array containing inner objects
       {
-        id: 3, // required, of inner object
+        id: '3', // required, of inner object
         name: 'Sub Cat 1', // required, label of inner object
       },
       {
-        id: 4,
+        id: '4',
         name: 'Sub Cat 3',
       },
     ],
   },
   {
-    id: 2,
+    id: '2',
     categoryName: 'Item 8',
-    subCategory: [{id: 22, name: 'Sub Cat 22'}],
+    subCategory: [{id: '22', name: 'Sub Cat 22'}],
   },
 ];
 ```
@@ -57,41 +57,41 @@ import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
-    id: 42,
+    id: '42',
     categoryName: 'Item 1',
     subCategory: [
       {
-        id: 1,
+        id: '1',
         name:
           "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged",
       },
-      {id: 2, name: 'Sub Item 2'},
+      {id: '2', name: 'Sub Item 2'},
     ],
   },
   {
-    id: 95,
+    id: '95',
     categoryName: 'Item 2',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
   {
-    id: 94,
+    id: '94',
     categoryName: 'Item 3',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
   {
-    id: 93,
+    id: '93',
     categoryName: 'Item 4',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
   {
-    id: 92,
+    id: '92',
     categoryName: 'Item 5',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
   {
-    id: 96,
+    id: '96',
     categoryName: 'Item 6',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
 ];
 
@@ -132,7 +132,7 @@ import ExpandableListView from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
-    id: 42,
+    id: '42',
     categoryName: 'Item 1',
     customItem: (
       <View style={{flexDirection: 'column'}}>
@@ -150,24 +150,24 @@ const CONTENT = [
             <Text>With whatever you need</Text>
           </View>
         ),
-        id: 1,
+        id: '1',
         name: '',
       },
-      {id: 2, name: 'Sub Item 2'},
+      {id: '2', name: 'Sub Item 2'},
     ],
   },
   {
-    id: 96,
+    id: '96',
     categoryName: 'Item 2',
-    subCategory: [{id: 1, name: 'Sub Item 1'}],
+    subCategory: [{id: '1', name: 'Sub Item 1'}],
   },
   {
-    id: 12,
+    id: '12',
     categoryName: 'Item 3',
     subCategory: [
-      {id: 1, name: 'Category 1'},
-      {id: 2, name: 'Category 2'},
-      {id: 3, name: 'Category 3'},
+      {id: '1', name: 'Category 1'},
+      {id: '2', name: 'Category 2'},
+      {id: '3', name: 'Category 3'},
     ],
   },
 ];
@@ -188,12 +188,15 @@ export default class YourComponent extends Component {
   render() {
     return (
       <ExpandableListView
+        // style={{borderTopWidth:1}} // styles to expandable listview
         // renderInnerItemSeparator={false} // true or false, render separator between inner items
         // renderItemSeparator={false} // true or false, render separator between Items
         // itemContainerStyle={{}} // add your styles to all item container of your list
         // itemLabelStyle={{}} // add your styles to all item text of your list
         // customChevron={{}} // your custom image to the indicator
-        // chevronColor= // "white" or "black" select wich color of the default indicator
+        // chevronColor="#000000" // hexstring color of the default indicator
+        // chevronHeight={30} // height of the default indicator
+        // chevronWidth={30} // width of the default indicator
         // innerItemContainerStyle={{}} // add your styles to all inner item containers of your list
         // itemLabelStyle={{}} // add your styles to all inner item text of your list
         // itemImageIndicatorStyle={{}} // add your styles to the image indicator of your list

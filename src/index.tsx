@@ -15,8 +15,9 @@ import {
 
 import styles from './styles';
 
-import chevronWhite from './assets/images/arrow_white.png';
-import chevronBlack from './assets/images/arrow_black.png';
+import White from './assets/images/chevro_white.svg';
+
+const Chevron = Animated.createAnimatedComponent(White);
 
 export interface InnerItem extends Object {
   /**Inner Item id */
@@ -29,7 +30,7 @@ export interface InnerItem extends Object {
 
 export interface Item extends Object {
   /**Item id */
-  id: number;
+  id: string;
   /**Inner Items */
   subCategory: InnerItem[];
   /**Default text for Item */
@@ -39,11 +40,14 @@ export interface Item extends Object {
 }
 
 interface Props {
+  /** Data for the expandable listview */
   data: Array<Item>;
   /** Callback for item click */
   onItemClick?: Function;
   /** Callback for inner item click */
   onInnerItemClick?: Function;
+  /** Add style to whole expandable listview */
+  styles?: ViewStyle;
   /** Add style to each inner item container */
   innerItemContainerStyle?: ViewStyle;
   /** Add style to each inner item label */
@@ -57,7 +61,11 @@ interface Props {
   /** Pass the path for your custom indicator */
   customChevron?: string;
   /** Color for default indicator */
-  chevronColor?: 'white' | 'black';
+  chevronColor?: string;
+  /** Height for default indicator */
+  chevronHeight?: number;
+  /** Width for default indicator */
+  chevronWidth?: number;
   /** Render separator for items */
   renderItemSeparator?: boolean;
   /** Render separator for inner items */
@@ -124,7 +132,7 @@ function reducer(
 
 export const ExpandableListView: React.FC<Props> = props => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  props.data;
   useEffect(() => {
     if (state.selectedIndex >= 0) {
       if (state.animatedValues[state.selectedIndex] !== undefined) {
@@ -357,43 +365,81 @@ export const ExpandableListView: React.FC<Props> = props => {
             CustomComponent
           ) : (
             <>
-              <Animated.Image
-                source={
-                  props.customChevron !== undefined
-                    ? props.customChevron
-                    : props.chevronColor !== undefined &&
-                      props.chevronColor === 'white'
-                    ? chevronWhite
-                    : chevronBlack
-                }
-                resizeMethod="scale"
-                resizeMode="contain"
-                style={[
-                  itemImageIndicatorStyle,
-                  props.animated === undefined ||
-                  (props.animated !== undefined && props.animated)
-                    ? state.rotateValueHolder[index] !== undefined && {
-                        transform: [
-                          {
-                            rotate: state.rotateValueHolder[index].interpolate({
-                              inputRange: [0, 1],
-                              outputRange: ['0deg', '90deg'],
-                            }),
-                          },
-                        ],
-                      }
-                    : {
-                        transform: [
-                          {
-                            rotate:
-                              state.opened && index === state.selectedIndex
-                                ? '90deg'
-                                : '0deg',
-                          },
-                        ],
-                      },
-                ]}
-              />
+              {props.customChevron !== undefined ? (
+                <Animated.Image
+                  source={props.customChevron}
+                  resizeMethod="scale"
+                  resizeMode="contain"
+                  style={[
+                    itemImageIndicatorStyle,
+                    props.animated === undefined ||
+                    (props.animated !== undefined && props.animated)
+                      ? state.rotateValueHolder[index] !== undefined && {
+                          transform: [
+                            {
+                              rotate: state.rotateValueHolder[
+                                index
+                              ].interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ['0deg', '90deg'],
+                              }),
+                            },
+                          ],
+                        }
+                      : {
+                          transform: [
+                            {
+                              rotate:
+                                state.opened && index === state.selectedIndex
+                                  ? '90deg'
+                                  : '0deg',
+                            },
+                          ],
+                        },
+                  ]}
+                />
+              ) : (
+                <Chevron
+                  fill={
+                    props.chevronColor !== undefined
+                      ? props.chevronColor
+                      : '#000000'
+                  }
+                  height={
+                    props.chevronHeight !== undefined ? props.chevronHeight : 36
+                  }
+                  width={
+                    props.chevronWidth !== undefined ? props.chevronWidth : 36
+                  }
+                  style={[
+                    itemImageIndicatorStyle,
+                    props.animated === undefined ||
+                    (props.animated !== undefined && props.animated)
+                      ? state.rotateValueHolder[index] !== undefined && {
+                          transform: [
+                            {
+                              rotate: state.rotateValueHolder[
+                                index
+                              ].interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ['0deg', '90deg'],
+                              }),
+                            },
+                          ],
+                        }
+                      : {
+                          transform: [
+                            {
+                              rotate:
+                                state.opened && index === state.selectedIndex
+                                  ? '90deg'
+                                  : '0deg',
+                            },
+                          ],
+                        },
+                  ]}
+                />
+              )}
               <Text style={itemLabelStyle}>{item.categoryName}</Text>
             </>
           )}
@@ -446,6 +492,7 @@ export const ExpandableListView: React.FC<Props> = props => {
 
   return (
     <List
+      style={props.styles}
       updateCellsBatchingPeriod={50}
       initialNumToRender={20}
       windowSize={20}
