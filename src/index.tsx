@@ -21,7 +21,7 @@ const Chevron = Animated.createAnimatedComponent(White);
 
 export interface InnerItem extends Object {
   /**Inner Item id */
-  id: number;
+  id: string;
   /**Default text for Inner Item */
   name?: string;
   /**Add your custom Inner Item */
