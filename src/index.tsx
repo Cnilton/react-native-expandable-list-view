@@ -17,8 +17,6 @@ import styles from './styles';
 
 import White from './assets/images/chevron_white.svg';
 
-const Chevron = Animated.createAnimatedComponent(White);
-
 export interface InnerItem extends Object {
   /**Inner Item id */
   id: string;
@@ -82,6 +80,28 @@ interface ExpandableListItem {
   item: Item;
   index: number;
 }
+
+interface ChevronProps {
+  fill?: string;
+  height?: number;
+  width?: number;
+  style?: Object;
+}
+
+class ChevronComponent extends React.Component<ChevronProps> {
+  render() {
+    return (
+      <White
+        fill={this.props.fill}
+        height={this.props.height}
+        width={this.props.width}
+        style={this.props.style}
+      />
+    );
+  }
+}
+
+const Chevron = Animated.createAnimatedComponent(ChevronComponent);
 
 const initialState = {
   opened: false,
