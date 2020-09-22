@@ -15,7 +15,7 @@ import {
 
 import styles from './styles';
 
-import White from './assets/images/chevro_white.svg';
+import White from './assets/images/chevron_white.svg';
 
 const Chevron = Animated.createAnimatedComponent(White);
 
