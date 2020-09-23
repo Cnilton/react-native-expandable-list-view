@@ -194,9 +194,7 @@ export default class YourComponent extends Component {
         // itemContainerStyle={{}} // add your styles to all item container of your list
         // itemLabelStyle={{}} // add your styles to all item text of your list
         // customChevron={{}} // your custom image to the indicator
-        // chevronColor="#000000" // hexstring color of the default indicator
-        // chevronHeight={30} // height of the default indicator
-        // chevronWidth={30} // width of the default indicator
+        // chevronColor="white" // color of the default indicator
         // innerItemContainerStyle={{}} // add your styles to all inner item containers of your list
         // itemLabelStyle={{}} // add your styles to all inner item text of your list
         // itemImageIndicatorStyle={{}} // add your styles to the image indicator of your list

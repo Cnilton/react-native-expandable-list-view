@@ -13,11 +13,10 @@ import {
   FlatList,
 } from 'react-native';
 
-import * as Animatable from 'react-native-animatable';
-
 import styles from './styles';
 
-import White from './assets/images/chevron_white.svg';
+import white_chevron from './assets/images/white.png';
+import black_chevron from './assets/images/black.png';
 
 export interface InnerItem extends Object {
   /**Inner Item id */
@@ -61,11 +60,7 @@ interface Props {
   /** Pass the path for your custom indicator */
   customChevron?: string;
   /** Color for default indicator */
-  chevronColor?: string;
-  /** Height for default indicator */
-  chevronHeight?: number;
-  /** Width for default indicator */
-  chevronWidth?: number;
+  chevronColor?: 'white' | 'black';
   /** Render separator for items */
   renderItemSeparator?: boolean;
   /** Render separator for inner items */
@@ -83,29 +78,6 @@ interface ExpandableListItem {
   index: number;
 }
 
-interface ChevronProps {
-  fill?: string;
-  height?: number;
-  width?: number;
-  style?: Object;
-}
-
-class ChevronComponent extends React.Component<ChevronProps> {
-  render() {
-    return (
-      <White
-        fill={this.props.fill}
-        height={this.props.height}
-        width={this.props.width}
-        style={this.props.style}
-      />
-    );
-  }
-}
-
-const Chevron = Animatable.createAnimatableComponent(ChevronComponent);
-// const Chevron = Animated.createAnimatedComponent(ChevronComponent);
-
 const initialState = {
   opened: false,
   height: [],
@@ -113,7 +85,7 @@ const initialState = {
   isMounted: [],
   lastSelectedIndex: -1,
   selectedIndex: -1,
-  opacityValues: [],
+  opacityValues: new Animated.Value(0),
   animatedValues: [],
   rotateValueHolder: [],
 };
@@ -128,7 +100,7 @@ function reducer(
     isMounted?: [];
     lastSelectedIndex?: number;
     selectedIndex?: number;
-    opacityValues?: Animated.Value[];
+    opacityValues?: Animated.Value;
     animatedValues?: Animated.Value[];
     rotateValueHolder?: Animated.Value[];
   },
@@ -144,7 +116,7 @@ function reducer(
         isMounted: [],
         lastSelectedIndex: -1,
         selectedIndex: -1,
-        opacityValues: [],
+        opacityValues: new Animated.Value(0),
         animatedValues: [],
         rotateValueHolder: [],
       };
@@ -155,7 +127,6 @@ function reducer(
 
 export const ExpandableListView: React.FC<Props> = props => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  props.data;
   useEffect(() => {
     if (state.selectedIndex >= 0) {
       if (state.animatedValues[state.selectedIndex] !== undefined) {
@@ -220,21 +191,23 @@ export const ExpandableListView: React.FC<Props> = props => {
         dispatch({type: 'set', lastSelectedIndex: state.selectedIndex});
       }
     } else {
-      if (state.opacityValues.length === state.data.length) {
-        state.opacityValues.map((_: any, index: number) => {
-          Animated.timing(state.opacityValues[index], {
-            toValue: 1,
-            duration: 200,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }).start();
-        });
+      if (
+        state.isMounted.length === state.data.length &&
+        state.data.length > 0
+      ) {
+        Animated.timing(state.opacityValues, {
+          toValue: 1,
+          duration: 200,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }).start();
       }
     }
   }, [
     state.data,
     state.height,
     state.opened,
+    state.isMounted,
     state.opacityValues,
     state.animatedValues,
     state.rotateValueHolder,
@@ -256,18 +229,15 @@ export const ExpandableListView: React.FC<Props> = props => {
       h[index] = evt.nativeEvent.layout.height;
       let m = state.isMounted;
       m[index] = true;
-      let newOpacityValues: Array<Animated.Value> = [...state.opacityValues];
       let newAnimatedValues: Array<Animated.Value> = [...state.animatedValues];
       let newRotateValueHolder: Array<Animated.Value> = [
         ...state.rotateValueHolder,
       ];
-      newOpacityValues.push(new Animated.Value(0));
       newAnimatedValues.push(new Animated.Value(0));
       newRotateValueHolder.push(new Animated.Value(0));
 
       dispatch({
         type: 'set',
-        opacityValues: newOpacityValues,
         animatedValues: newAnimatedValues,
         rotateValueHolder: newRotateValueHolder,
         height: h,
@@ -289,7 +259,7 @@ export const ExpandableListView: React.FC<Props> = props => {
     return;
   }
 
-  const List = useMemo(() => FlatList, []);
+  const List = useMemo(() => Animated.FlatList, []);
 
   function renderInnerItem(itemO: any, headerItem: Item, headerIndex: number) {
     let {item}: {item: InnerItem} = itemO;
@@ -361,6 +331,9 @@ export const ExpandableListView: React.FC<Props> = props => {
       ...itemLabelStyle,
     };
     itemImageIndicatorStyle = {
+      height: 15,
+      width: 15,
+      marginHorizontal: 5,
       ...itemImageIndicatorStyle,
     };
 
@@ -369,16 +342,8 @@ export const ExpandableListView: React.FC<Props> = props => {
     let CustomComponent = item.customItem;
     return (
       <Animated.View
-        // eslint-disable-next-line react-native/no-inline-styles
         style={{
           height: undefined,
-          opacity:
-            props.animated === undefined ||
-            (props.animated !== undefined && props.animated)
-              ? state.isMounted[index]
-                ? state.opacityValues[index]
-                : 0
-              : 1,
         }}>
         <TouchableOpacity
           activeOpacity={0.6}
@@ -388,81 +353,44 @@ export const ExpandableListView: React.FC<Props> = props => {
             CustomComponent
           ) : (
             <>
-              {props.customChevron !== undefined ? (
-                <Animated.Image
-                  source={props.customChevron}
-                  resizeMethod="scale"
-                  resizeMode="contain"
-                  style={[
-                    itemImageIndicatorStyle,
-                    props.animated === undefined ||
-                    (props.animated !== undefined && props.animated)
-                      ? state.rotateValueHolder[index] !== undefined && {
-                          transform: [
-                            {
-                              rotate: state.rotateValueHolder[
-                                index
-                              ].interpolate({
-                                inputRange: [0, 1],
-                                outputRange: ['0deg', '90deg'],
-                              }),
-                            },
-                          ],
-                        }
-                      : {
-                          transform: [
-                            {
-                              rotate:
-                                state.opened && index === state.selectedIndex
-                                  ? '90deg'
-                                  : '0deg',
-                            },
-                          ],
-                        },
-                  ]}
-                />
-              ) : (
-                <Chevron
-                  fill={
-                    props.chevronColor !== undefined
-                      ? props.chevronColor
-                      : '#000000'
-                  }
-                  height={
-                    props.chevronHeight !== undefined ? props.chevronHeight : 36
-                  }
-                  width={
-                    props.chevronWidth !== undefined ? props.chevronWidth : 36
-                  }
-                  style={[
-                    itemImageIndicatorStyle,
-                    props.animated === undefined ||
-                    (props.animated !== undefined && props.animated)
-                      ? state.rotateValueHolder[index] !== undefined && {
-                          transform: [
-                            {
-                              rotate: state.rotateValueHolder[
-                                index
-                              ].interpolate({
-                                inputRange: [0, 1],
-                                outputRange: ['0deg', '90deg'],
-                              }),
-                            },
-                          ],
-                        }
-                      : {
-                          transform: [
-                            {
-                              rotate:
-                                state.opened && index === state.selectedIndex
-                                  ? '90deg'
-                                  : '0deg',
-                            },
-                          ],
-                        },
-                  ]}
-                />
-              )}
+              <Animated.Image
+                source={
+                  props.customChevron !== undefined
+                    ? props.customChevron
+                    : props.chevronColor !== undefined &&
+                      props.chevronColor === 'white'
+                    ? white_chevron
+                    : black_chevron
+                }
+                resizeMethod="scale"
+                resizeMode="contain"
+                style={[
+                  itemImageIndicatorStyle,
+                  props.animated === undefined ||
+                  (props.animated !== undefined && props.animated)
+                    ? state.rotateValueHolder[index] !== undefined && {
+                        transform: [
+                          {
+                            rotate: state.rotateValueHolder[index].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: ['0deg', '90deg'],
+                            }),
+                          },
+                        ],
+                      }
+                    : {
+                        transform: [
+                          {
+                            rotate:
+                              state.opened && index === state.selectedIndex
+                                ? '90deg'
+                                : '0deg',
+                          },
+                        ],
+                      },
+                ]}
+              />
+
               <Text style={itemLabelStyle}>{item.categoryName}</Text>
             </>
           )}
@@ -514,15 +442,30 @@ export const ExpandableListView: React.FC<Props> = props => {
   }
 
   return (
-    <List
-      style={props.styles}
-      updateCellsBatchingPeriod={50}
-      initialNumToRender={20}
-      windowSize={20}
-      maxToRenderPerBatch={20}
-      keyExtractor={(item: any, itemIndex: number) => itemIndex.toString()}
-      data={state.data}
-      renderItem={(item: ExpandableListItem) => renderItem(item)}
-    />
+    <Animated.View
+      style={[
+        // eslint-disable-next-line react-native/no-inline-styles
+        {
+          opacity:
+            props.animated === undefined ||
+            (props.animated !== undefined && props.animated)
+              ? state.isMounted.length === state.data.length &&
+                props.data.length > 0
+                ? state.opacityValues
+                : 0
+              : 1,
+        },
+        {...props.styles},
+      ]}>
+      <List
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={20}
+        windowSize={20}
+        maxToRenderPerBatch={20}
+        keyExtractor={(item: any, itemIndex: number) => itemIndex.toString()}
+        data={state.data}
+        renderItem={(item: ExpandableListItem) => renderItem(item)}
+      />
+    </Animated.View>
   );
 };
