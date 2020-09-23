@@ -13,6 +13,8 @@ import {
   FlatList,
 } from 'react-native';
 
+import * as Animatable from 'react-native-animatable';
+
 import styles from './styles';
 
 import White from './assets/images/chevron_white.svg';
@@ -101,7 +103,8 @@ class ChevronComponent extends React.Component<ChevronProps> {
   }
 }
 
-const Chevron = Animated.createAnimatedComponent(ChevronComponent);
+const Chevron = Animatable.createAnimatableComponent(ChevronComponent);
+// const Chevron = Animated.createAnimatedComponent(ChevronComponent);
 
 const initialState = {
   opened: false,
