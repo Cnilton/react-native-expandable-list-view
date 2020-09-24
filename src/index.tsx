@@ -18,16 +18,16 @@ import styles from './styles';
 import white_chevron from './assets/images/white.png';
 import black_chevron from './assets/images/black.png';
 
-export interface InnerItem extends Object {
+export type InnerItem = {
   /**Inner Item id */
   id: string;
   /**Default text for Inner Item */
   name?: string;
   /**Add your custom Inner Item */
   customInnerItem?: JSX.Element;
-}
+};
 
-export interface Item extends Object {
+export interface Item {
   /**Item id */
   id: string;
   /**Inner Items */
@@ -38,19 +38,29 @@ export interface Item extends Object {
   customItem?: JSX.Element;
 }
 
+interface InnerItemClickCallback {
+  innerItemIndex: number;
+  item: Item;
+  itemIndex: number;
+}
+
 interface Props {
   /** Data for the expandable listview */
   data: Array<Item>;
   /** Callback for item click */
-  onItemClick?: Function;
+  onItemClick?: ({index}: {index: number}) => void;
   /** Callback for inner item click */
-  onInnerItemClick?: Function;
+  onInnerItemClick?: ({
+    innerItemIndex,
+    item,
+    itemIndex,
+  }: InnerItemClickCallback) => void;
   /** Add style to whole expandable listview */
   styles?: ViewStyle;
   /** Add style to each inner item container */
   innerItemContainerStyle?: ViewStyle;
   /** Add style to each inner item label */
-  innerItemLabelStyle?: ViewStyle;
+  innerItemLabelStyle?: TextStyle;
   /** Add style to each item container */
   itemContainerStyle?: ViewStyle;
   /** Add style to each item label */
@@ -254,7 +264,7 @@ export const ExpandableListView: React.FC<Props> = props => {
     });
 
     if (props.onItemClick) {
-      return props.onItemClick(updatedIndex);
+      return props.onItemClick({index: updatedIndex});
     }
     return;
   }
@@ -297,7 +307,11 @@ export const ExpandableListView: React.FC<Props> = props => {
           style={container}
           onPress={() =>
             props.onInnerItemClick &&
-            props.onInnerItemClick(index, headerItem, headerIndex)
+            props.onInnerItemClick({
+              innerItemIndex: index,
+              item: headerItem,
+              itemIndex: headerIndex,
+            })
           }>
           {CustomComponent !== undefined ? (
             CustomComponent
