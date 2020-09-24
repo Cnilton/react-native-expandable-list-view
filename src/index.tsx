@@ -321,7 +321,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         </TouchableOpacity>
         {props.renderInnerItemSeparator !== undefined &&
           props.renderInnerItemSeparator &&
-          index < state.data.length - 1 && (
+          index < headerItem.subCategory.length - 1 && (
             <View style={innerItemSeparatorStyle} />
           )}
       </>
@@ -450,7 +450,7 @@ export const ExpandableListView: React.FC<Props> = props => {
         {props.renderItemSeparator !== undefined &&
           props.renderItemSeparator &&
           (!state.opened || state.selectedIndex !== index) &&
-          state.data.length > index + 1 && <View style={itemSeparatorStyle} />}
+          index < state.data.length - 1 && <View style={itemSeparatorStyle} />}
       </Animated.View>
     );
   }
