@@ -53,7 +53,7 @@ const CONTENT = [
 ```javascript
 //...
 import React, {Component} from 'react';
-import ExpandableListView from 'react-native-expandable-listview';
+import {ExpandableListView} from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
@@ -95,25 +95,21 @@ const CONTENT = [
   },
 ];
 
-export default class YourComponent extends Component {
-  state = {
-    listDataSource: CONTENT,
-  };
-
-  handleItemClick = index => {
+function YourComponent() {
+  function handleItemClick({index}) {
     console.log(index);
   };
 
-  handleInnerItemClick = (innerIndex, ItemItem, ItemIndex) => {
+  function handleInnerItemClick({innerIndex, item, itemIndex}) {
     console.log(innerIndex);
   };
 
   render() {
     return (
       <ExpandableListView
-        data={this.state.listDataSource} // required
-        onInnerItemClick={this.handleInnerItemClick.bind(this)}
-        onItemClick={this.handleItemClick.bind(this)}
+        data={CONTENT} // required
+        onInnerItemClick={handleInnerItemClick}
+        onItemClick={handleItemClick}
       />
     );
   }
@@ -128,7 +124,7 @@ export default class YourComponent extends Component {
 //...
 import React, {Component} from 'react';
 import {Text, Image} from 'react-native';
-import ExpandableListView from 'react-native-expandable-listview';
+import {ExpandableListView} from 'react-native-expandable-listview';
 
 const CONTENT = [
   {
@@ -172,23 +168,21 @@ const CONTENT = [
   },
 ];
 
-export default class YourComponent extends Component {
-  state = {
-    listDataSource: CONTENT,
-  };
+function YourComponent() {
+  const [listDataSource, setListDataSource] = useState([])
 
-  handleItemClick = index => {
+  function handleItemClick({index}) {
     console.log(index);
   };
 
-  handleInnerItemClick = (innerIndex, item, itemIndex) => {
+  function handleInnerItemClick({innerIndex, item, itemIndex}) {
     console.log(innerIndex);
   };
 
   render() {
     return (
       <ExpandableListView
-        // style={{borderTopWidth:1}} // styles to expandable listview
+        // ExpandableListViewStyles={{borderTopWidth:1}} // styles to expandable listview
         // renderInnerItemSeparator={false} // true or false, render separator between inner items
         // renderItemSeparator={false} // true or false, render separator between Items
         // itemContainerStyle={{}} // add your styles to all item container of your list
@@ -199,9 +193,11 @@ export default class YourComponent extends Component {
         // itemLabelStyle={{}} // add your styles to all inner item text of your list
         // itemImageIndicatorStyle={{}} // add your styles to the image indicator of your list
         // animated={true} // sets all animations on/off, default on
-        data={this.state.listDataSource}
-        onInnerItemClick={this.handleInnerItemClick.bind(this)}
-        onItemClick={this.handleItemClick.bind(this)}
+        // defaultLoaderStyles?: ViewStyle; // Set your styles to default loader (only for animated={true})
+        // customLoader?: JSX.Element; Pass your custom loader, while your content is measured and rendered (only for animated={true})
+        data={listDataSource}
+        onInnerItemClick={handleInnerItemClick}
+        onItemClick={handleItemClick}
       />
     );
   }
@@ -209,6 +205,15 @@ export default class YourComponent extends Component {
 ```
 
 - All commented options above are optional.
+
+- If you want to use the "customLoader" prop, provide JSX.Element or a Component, for example:
+
+```javascript
+import {View, ActivityIndicator} from 'react-native';
+// ...
+  const myLoader = (<View><ActivityIndicator /></View>)
+```
+
 - If you want to use the "customChevron" prop, provide a image path, for example:
 
 ```javascript

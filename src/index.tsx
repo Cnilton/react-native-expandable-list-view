@@ -1,6 +1,7 @@
 import React, {useEffect, useReducer, useMemo} from 'react';
 
 import {
+  ActivityIndicator,
   TouchableOpacity,
   Animated,
   Text,
@@ -13,7 +14,7 @@ import {
   FlatList,
 } from 'react-native';
 
-import styles from './styles';
+import {styles} from './styles';
 
 import white_chevron from './assets/images/white.png';
 import black_chevron from './assets/images/black.png';
@@ -56,7 +57,7 @@ interface Props {
     itemIndex,
   }: InnerItemClickCallback) => void;
   /** Add style to whole expandable listview */
-  styles?: ViewStyle;
+  ExpandableListViewStyles?: ViewStyle;
   /** Add style to each inner item container */
   innerItemContainerStyle?: ViewStyle;
   /** Add style to each inner item label */
@@ -81,6 +82,10 @@ interface Props {
   innerItemSeparatorStyle?: ViewStyle;
   /** Set Animation on/off, default on */
   animated?: boolean;
+  /** Set your styles to default loader (only for animated={true}) */
+  defaultLoaderStyles?: ViewStyle;
+  /** Pass your custom loader, while your content is measured and rendered (only for animated={true}) */
+  customLoader?: JSX.Element;
 }
 
 interface ExpandableListItem {
@@ -135,8 +140,9 @@ function reducer(
   }
 }
 
-export const ExpandableListView: React.FC<Props> = props => {
+export const ExpandableListView: React.FC<Props> = ({data,innerItemLabelStyle,renderItemSeparator,renderInnerItemSeparator,onInnerItemClick,onItemClick,defaultLoaderStyles,itemSeparatorStyle,itemLabelStyle,itemImageIndicatorStyle,itemContainerStyle,innerItemSeparatorStyle,innerItemContainerStyle,customLoader,customChevron,animated=true,chevronColor, ExpandableListViewStyles}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const CustomLoader = customLoader;
   useEffect(() => {
     if (state.selectedIndex >= 0) {
       if (state.animatedValues[state.selectedIndex] !== undefined) {
@@ -207,7 +213,7 @@ export const ExpandableListView: React.FC<Props> = props => {
       ) {
         Animated.timing(state.opacityValues, {
           toValue: 1,
-          duration: 200,
+          duration: 300,
           easing: Easing.linear,
           useNativeDriver: true,
         }).start();
@@ -228,10 +234,10 @@ export const ExpandableListView: React.FC<Props> = props => {
   useEffect(() => {
     async function reset() {
       await dispatch({type: 'reset'});
-      await dispatch({type: 'set', data: props.data});
+      await dispatch({type: 'set', data: data});
     }
     reset();
-  }, [props.data]);
+  }, [data]);
 
   function handleLayout(evt: LayoutChangeEvent, index: number) {
     if (!state.isMounted[index] && evt.nativeEvent.layout.height !== 0) {
@@ -263,8 +269,8 @@ export const ExpandableListView: React.FC<Props> = props => {
       selectedIndex: updatedIndex,
     });
 
-    if (props.onItemClick) {
-      return props.onItemClick({index: updatedIndex});
+    if (onItemClick) {
+      return onItemClick({index: updatedIndex});
     }
     return;
   }
@@ -276,12 +282,6 @@ export const ExpandableListView: React.FC<Props> = props => {
     let {index}: {index: number} = itemO;
 
     let CustomComponent = item.customInnerItem;
-
-    let {
-      innerItemContainerStyle,
-      innerItemLabelStyle,
-      innerItemSeparatorStyle,
-    } = props;
 
     let container = {
       ...styles.content,
@@ -306,8 +306,8 @@ export const ExpandableListView: React.FC<Props> = props => {
           key={Math.random()}
           style={container}
           onPress={() =>
-            props.onInnerItemClick &&
-            props.onInnerItemClick({
+            onInnerItemClick &&
+            onInnerItemClick({
               innerItemIndex: index,
               item: headerItem,
               itemIndex: headerIndex,
@@ -319,8 +319,8 @@ export const ExpandableListView: React.FC<Props> = props => {
             <Text style={innerItemLabelStyle}>{item.name}</Text>
           )}
         </TouchableOpacity>
-        {props.renderInnerItemSeparator !== undefined &&
-          props.renderInnerItemSeparator &&
+        {renderInnerItemSeparator !== undefined &&
+          renderInnerItemSeparator &&
           index < headerItem.subCategory.length - 1 && (
             <View style={innerItemSeparatorStyle} />
           )}
@@ -329,12 +329,7 @@ export const ExpandableListView: React.FC<Props> = props => {
   }
 
   function renderItem({item, index}: ExpandableListItem) {
-    let {
-      itemContainerStyle,
-      itemLabelStyle,
-      itemImageIndicatorStyle,
-      itemSeparatorStyle,
-    } = props;
+
     itemContainerStyle = {
       ...styles.header,
       ...itemContainerStyle,
@@ -369,10 +364,10 @@ export const ExpandableListView: React.FC<Props> = props => {
             <>
               <Animated.Image
                 source={
-                  props.customChevron !== undefined
-                    ? props.customChevron
-                    : props.chevronColor !== undefined &&
-                      props.chevronColor === 'white'
+                  customChevron !== undefined
+                    ? customChevron
+                    : chevronColor !== undefined &&
+                      chevronColor === 'white'
                     ? white_chevron
                     : black_chevron
                 }
@@ -380,8 +375,8 @@ export const ExpandableListView: React.FC<Props> = props => {
                 resizeMode="contain"
                 style={[
                   itemImageIndicatorStyle,
-                  props.animated === undefined ||
-                  (props.animated !== undefined && props.animated)
+                  animated === undefined ||
+                  (animated !== undefined && animated)
                     ? state.rotateValueHolder[index] !== undefined && {
                         transform: [
                           {
@@ -412,8 +407,8 @@ export const ExpandableListView: React.FC<Props> = props => {
 
         <Animated.View
           style={[
-            props.animated === undefined ||
-            (props.animated !== undefined && props.animated)
+            animated === undefined ||
+            (animated !== undefined && animated)
               ? // eslint-disable-next-line react-native/no-inline-styles
                 {
                   height: !state.isMounted[index]
@@ -435,9 +430,9 @@ export const ExpandableListView: React.FC<Props> = props => {
             style={{height: undefined}}
             contentContainerStyle={{height: undefined}}
             updateCellsBatchingPeriod={50}
-            initialNumToRender={20}
-            windowSize={20}
-            maxToRenderPerBatch={20}
+            initialNumToRender={50}
+            windowSize={50}
+            maxToRenderPerBatch={50}
             keyExtractor={() => Math.random().toString()}
             listKey={String(Math.random())}
             data={item.subCategory}
@@ -447,8 +442,8 @@ export const ExpandableListView: React.FC<Props> = props => {
           />
         </Animated.View>
 
-        {props.renderItemSeparator !== undefined &&
-          props.renderItemSeparator &&
+        {renderItemSeparator !== undefined &&
+          renderItemSeparator &&
           (!state.opened || state.selectedIndex !== index) &&
           index < state.data.length - 1 && <View style={itemSeparatorStyle} />}
       </Animated.View>
@@ -456,30 +451,37 @@ export const ExpandableListView: React.FC<Props> = props => {
   }
 
   return (
+    <>
+    {animated && data.length >0 && state.isMounted[data.length -1] === undefined && (CustomLoader !== undefined ? CustomLoader : <ActivityIndicator style={defaultLoaderStyles} color="#94bfda" size="large" />)}
+
     <Animated.View
       style={[
         // eslint-disable-next-line react-native/no-inline-styles
         {
           opacity:
-            props.animated === undefined ||
-            (props.animated !== undefined && props.animated)
+            animated === undefined ||
+            (animated !== undefined && animated)
               ? state.isMounted.length === state.data.length &&
-                props.data.length > 0
+                data.length > 0
                 ? state.opacityValues
                 : 0
               : 1,
         },
-        {...props.styles},
+        {...ExpandableListViewStyles},
+        {height: animated && data.length >0 && state.isMounted[data.length -1] === undefined ? 0 : ExpandableListViewStyles?.height !== undefined ? ExpandableListViewStyles?.height : 'auto'},
       ]}>
+
+
       <List
         updateCellsBatchingPeriod={50}
-        initialNumToRender={20}
-        windowSize={20}
-        maxToRenderPerBatch={20}
-        keyExtractor={(item: any, itemIndex: number) => itemIndex.toString()}
+        initialNumToRender={50}
+        windowSize={50}
+        maxToRenderPerBatch={50}
+        keyExtractor={(_: any, itemIndex: number) => itemIndex.toString()}
         data={state.data}
         renderItem={(item: ExpandableListItem) => renderItem(item)}
       />
     </Animated.View>
+    </>
   );
 };
