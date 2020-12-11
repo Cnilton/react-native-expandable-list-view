@@ -1,5 +1,6 @@
 ![npm](https://img.shields.io/npm/v/react-native?color=%232fa90f&label=react-native&style=plastic)
 ![npm](https://img.shields.io/npm/dm/react-native-expandable-listview?style=plastic)
+![npm](https://img.shields.io/npm/dt/react-native-expandable-listview?style=plastic)
 
 # About
 
